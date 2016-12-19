@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Lib", "MessageHub.Lib\MessageHub.Lib.csproj", "{3BBBCEC1-3C7C-42A8-BB80-E1FB221B225B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Lib.Test", "MessageHub.Lib.Test\MessageHub.Lib.Test.csproj", "{1A553772-A317-42CA-B2D6-355CEAE3F300}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3BBBCEC1-3C7C-42A8-BB80-E1FB221B225B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BBBCEC1-3C7C-42A8-BB80-E1FB221B225B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BBBCEC1-3C7C-42A8-BB80-E1FB221B225B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BBBCEC1-3C7C-42A8-BB80-E1FB221B225B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A553772-A317-42CA-B2D6-355CEAE3F300}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A553772-A317-42CA-B2D6-355CEAE3F300}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A553772-A317-42CA-B2D6-355CEAE3F300}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A553772-A317-42CA-B2D6-355CEAE3F300}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
