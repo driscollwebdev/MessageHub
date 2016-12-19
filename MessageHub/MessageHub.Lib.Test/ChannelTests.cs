@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MessageHub.Lib.Interfaces;
 
 namespace MessageHub.Lib.Test
 {
@@ -26,13 +27,13 @@ namespace MessageHub.Lib.Test
         }
 
         [TestMethod]
-        public void ShouldHaveHubIdAfterWithHubId()
+        public void ShouldHaveHubAfterWithHub()
         {
-            Guid hubId = Guid.NewGuid();
-            var test = Channel.Create().WithHubId(hubId);
+            IMessageHub hub = MessageHub.Create();
+            var test = Channel.Create().WithHub(hub);
 
             Assert.IsNotNull(test);
-            Assert.AreEqual(hubId, test.HubId);
+            Assert.AreEqual(hub, test.Hub);
         }
     }
 }

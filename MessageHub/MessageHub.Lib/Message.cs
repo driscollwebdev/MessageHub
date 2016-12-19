@@ -1,10 +1,12 @@
 ﻿namespace MessageHub.Lib
 {
     using System;
+    using System.IO;
     using System.Runtime.Serialization;
+    using System.Runtime.Serialization.Formatters.Binary;
 
     [DataContract(Namespace = "")]
-    public abstract class Message
+    public class Message
     {
         [DataMember]
         public string Type { get; set; }
@@ -16,37 +18,62 @@
         public Guid? HubId { get; set; }
 
         [DataMember]
-        public virtual string Data { get; set; }
+        public string Data { get; set; }
+
+        [DataMember]
+        public Type DataType { get; set; }
 
         protected Message() { }
 
-        public static TMessage Create<TMessage>() where TMessage : Message, new()
+        public static Message Create()
         {
-            return Activator.CreateInstance<TMessage>();
+            return new Message();
         }
 
-        public TMessage WithType<TMessage>(string type) where TMessage : Message
+        public Message WithType(string type)
         {
             Type = type;
-            return this as TMessage;
+            return this;
         }
 
-        public TMessage WithChannelName<TMessage>(string channelName) where TMessage : Message
+        public Message WithChannelName(string channelName)
         {
             ChannelName = channelName;
-            return this as TMessage;
+            return this;
         }
 
-        public TMessage WithHubId<TMessage>(Guid hubId) where TMessage : Message
+        public Message WithHubId(Guid hubId)
         {
             HubId = hubId;
-            return this as TMessage;
+            return this;
         }
 
-        public TMessage WithData<TMessage>(string data) where TMessage : Message
+        public Message WithData(object data)
         {
-            Data = data;
-            return this as TMessage;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(ms, data);
+                byte[] serializedData = ms.ToArray();
+                Data = System.Convert.ToBase64String(serializedData);
+                DataType = data.GetType();
+            }
+
+            return this;
+        }
+
+        public object GetDataObject()
+        {
+            object dataObject = null;
+
+            byte[] decodedData = System.Convert.FromBase64String(Data);
+            using (MemoryStream ms = new MemoryStream(decodedData))
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                dataObject = bf.Deserialize(ms);
+            }
+
+            return dataObject;
         }
     }
 }

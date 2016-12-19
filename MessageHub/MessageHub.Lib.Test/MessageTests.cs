@@ -9,25 +9,49 @@ namespace MessageHub.Lib.Test
         [TestMethod]
         public void ShouldCreateInstanceOfType()
         {
-            var test = Message.Create<MessageStub>();
+            var test = Message.Create();
 
             Assert.IsNotNull(test);
-            Assert.IsInstanceOfType(test, typeof(MessageStub));
         }
 
         [TestMethod]
         public void ShouldHaveTypeAfterWithType()
         {
             string type = "Test";
-            var test = Message.Create<MessageStub>().WithType<MessageStub>(type);
+            var test = Message.Create().WithType(type);
 
             Assert.IsNotNull(test);
             Assert.AreEqual(type, test.Type);
         }
 
-        private class MessageStub : Message
+        [TestMethod]
+        public void ShouldHaveChannelNameAfterWithChannelName()
         {
+            string channelName = "Test";
+            var test = Message.Create().WithChannelName(channelName);
 
+            Assert.IsNotNull(test);
+            Assert.AreEqual(channelName, test.ChannelName);
+        }
+
+        [TestMethod]
+        public void ShouldHaveHubIdAfterWithHubId()
+        {
+            Guid hubId = Guid.NewGuid();
+            var test = Message.Create().WithHubId(hubId);
+
+            Assert.IsNotNull(test);
+            Assert.AreEqual(hubId, test.HubId);
+        }
+
+        [TestMethod]
+        public void ShouldHaveDataAfterWithData()
+        {
+            string data = "testData";
+            var test = Message.Create().WithData(data);
+
+            Assert.IsNotNull(test);
+            Assert.AreEqual(data, (string)test.GetDataObject());
         }
     }
 }
