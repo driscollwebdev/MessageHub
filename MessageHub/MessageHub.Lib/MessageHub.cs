@@ -11,11 +11,13 @@
     {
         private IDictionary<string, Channel> _channels = new Dictionary<string, Channel>();
 
+        public event EventHandler<MessageEventArgs> Broadcasting;
+
         public Guid Id { get; } = Guid.NewGuid();
 
         private MessageHub() { }
 
-        public static MessageHub Create()
+        public static IMessageHub Create()
         {
             return new MessageHub();
         }
@@ -24,15 +26,39 @@
         {
             if (!_channels.ContainsKey(name))
             {
-                _channels[name] = Lib.Channel.Create().WithName(name).WithHub(this);
+                var channel = Lib.Channel.Create().WithName(name);
+                channel.MessageSending += Channel_MessageSending;
+
+                _channels[name] = channel;
             }
 
             return _channels[name];
         }
 
-        async Task IMessageHub.Broadcast(Message message)
+        private async void Channel_MessageSending(object sender, MessageEventArgs e)
         {
-            throw new NotImplementedException();
+            Channel sendingChannel = sender as Channel;
+
+            if (sendingChannel == null || !_channels.Values.Any(c => c.Id == sendingChannel.Id))
+            {
+                return;
+            }
+
+            await Broadcast(e.Message); 
+        }
+
+        public virtual Task Broadcast(Message message)
+        {
+            Broadcasting(this, new MessageEventArgs(message));
+            return Task.CompletedTask;
+        }
+
+        public virtual async Task Receive(Message message)
+        {
+            if (_channels.ContainsKey(message.ChannelName))
+            {
+                await _channels[message.ChannelName].Receive(message);
+            }
         }
     }
 }

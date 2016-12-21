@@ -27,13 +27,13 @@ namespace MessageHub.Lib.Test
         }
 
         [TestMethod]
-        public void ShouldHaveHubAfterWithHub()
+        public void ShouldHaveIdAfterWithId()
         {
-            IMessageHub hub = MessageHub.Create();
-            var test = Channel.Create().WithHub(hub);
+            Guid id = Guid.NewGuid();
+            var test = Channel.Create().WithId(id);
 
             Assert.IsNotNull(test);
-            Assert.AreEqual(hub, test.Hub);
+            Assert.AreEqual(id, test.Id);
         }
     }
 }

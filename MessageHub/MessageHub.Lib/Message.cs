@@ -15,7 +15,7 @@
         public string ChannelName { get; set; }
 
         [DataMember]
-        public Guid? HubId { get; set; }
+        public Guid ChannelId { get; set; }
 
         [DataMember]
         public string Data { get; set; }
@@ -36,15 +36,15 @@
             return this;
         }
 
-        public Message WithChannelName(string channelName)
+        public Message ToChannelName(string channelName)
         {
             ChannelName = channelName;
             return this;
         }
 
-        public Message WithHubId(Guid hubId)
+        public Message FromChannelId(Guid channelId)
         {
-            HubId = hubId;
+            ChannelId = channelId;
             return this;
         }
 

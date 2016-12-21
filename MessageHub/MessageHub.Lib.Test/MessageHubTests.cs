@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MessageHub.Lib.Interfaces;
 
 namespace MessageHub.Lib.Test
 {
@@ -9,7 +10,7 @@ namespace MessageHub.Lib.Test
         [TestMethod]
         public void ShouldReturnAChannelInstance()
         {
-            MessageHub hub = MessageHub.Create();
+            IMessageHub hub = MessageHub.Create();
             Channel actual = hub.Channel("test");
 
             Assert.IsNotNull(actual);

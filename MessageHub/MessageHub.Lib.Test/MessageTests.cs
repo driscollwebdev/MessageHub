@@ -28,20 +28,20 @@ namespace MessageHub.Lib.Test
         public void ShouldHaveChannelNameAfterWithChannelName()
         {
             string channelName = "Test";
-            var test = Message.Create().WithChannelName(channelName);
+            var test = Message.Create().ToChannelName(channelName);
 
             Assert.IsNotNull(test);
             Assert.AreEqual(channelName, test.ChannelName);
         }
 
         [TestMethod]
-        public void ShouldHaveHubIdAfterWithHubId()
+        public void ShouldHaveChannelIdAfterFromChannelId()
         {
-            Guid hubId = Guid.NewGuid();
-            var test = Message.Create().WithHubId(hubId);
+            Guid channelId = Guid.NewGuid();
+            var test = Message.Create().FromChannelId(channelId);
 
             Assert.IsNotNull(test);
-            Assert.AreEqual(hubId, test.HubId);
+            Assert.AreEqual(channelId, test.ChannelId);
         }
 
         [TestMethod]

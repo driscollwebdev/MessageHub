@@ -10,5 +10,7 @@ namespace MessageHub.Lib.Interfaces
         Channel Channel(string name);
 
         Task Broadcast(Message message);
+
+        Task Receive(Message message);
     }
 }
