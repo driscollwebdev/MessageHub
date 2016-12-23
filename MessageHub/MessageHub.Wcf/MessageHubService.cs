@@ -1,4 +1,4 @@
-﻿namespace MessageHub.Services
+﻿namespace MessageHub.Wcf
 {
     using System;
     using Interfaces;

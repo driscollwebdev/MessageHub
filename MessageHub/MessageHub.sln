@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Lib", "MessageHu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Lib.Test", "MessageHub.Lib.Test\MessageHub.Lib.Test.csproj", "{1A553772-A317-42CA-B2D6-355CEAE3F300}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Wcf", "MessageHub.Wcf\MessageHub.Wcf.csproj", "{A1E29FA4-1A18-4CD6-AC28-EF5F75ABB375}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Wcf.Test", "MessageHub.Wcf.Test\MessageHub.Wcf.Test.csproj", "{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{1A553772-A317-42CA-B2D6-355CEAE3F300}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A553772-A317-42CA-B2D6-355CEAE3F300}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A553772-A317-42CA-B2D6-355CEAE3F300}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1E29FA4-1A18-4CD6-AC28-EF5F75ABB375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1E29FA4-1A18-4CD6-AC28-EF5F75ABB375}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1E29FA4-1A18-4CD6-AC28-EF5F75ABB375}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1E29FA4-1A18-4CD6-AC28-EF5F75ABB375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

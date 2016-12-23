@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3BBBCEC1-3C7C-42A8-BB80-E1FB221B225B}</ProjectGuid>
+    <ProjectGuid>{A1E29FA4-1A18-4CD6-AC28-EF5F75ABB375}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MessageHub.Lib</RootNamespace>
-    <AssemblyName>MessageHub.Lib</AssemblyName>
+    <RootNamespace>MessageHub.Wcf</RootNamespace>
+    <AssemblyName>MessageHub.Wcf</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,7 +32,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -42,17 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Channel.cs" />
-    <Compile Include="Hubs\RemoteMessageHub.cs" />
-    <Compile Include="Interfaces\IMessageHub.cs" />
-    <Compile Include="Interfaces\IMessageHubService.cs" />
-    <Compile Include="Interfaces\IMessageHubServiceReceiver.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="Hubs\LocalMessageHub.cs" />
-    <Compile Include="MessageEventArgs.cs" />
+    <Compile Include="MessageHubService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\MessageHub.Lib\MessageHub.Lib.csproj">
+      <Project>{3bbbcec1-3c7c-42a8-bb80-e1fb221b225b}</Project>
+      <Name>MessageHub.Lib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

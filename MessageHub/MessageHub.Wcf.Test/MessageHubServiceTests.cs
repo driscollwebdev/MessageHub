@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using MessageHub.Interfaces;
-using MessageHub.Services;
+using MessageHub.Wcf;
 using System.ServiceModel;
 
 namespace MessageHub.Lib.Test
