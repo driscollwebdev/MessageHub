@@ -12,7 +12,7 @@
     /// <summary>
     /// A class representing a specific channel/topic of interest
     /// </summary>
-    public class Channel
+    public sealed class Channel
     {
         private IDictionary<string, IEnumerable<Receiver>> _receivers = new ConcurrentDictionary<string, IEnumerable<Receiver>>();
 

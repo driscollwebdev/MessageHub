@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     using System.Collections.Concurrent;
 
-    public class LocalMessageHub : IMessageHub
+    public sealed class LocalMessageHub : IMessageHub
     {
         private IDictionary<string, Channel> _channels = new ConcurrentDictionary<string, Channel>();
 
@@ -50,7 +50,7 @@
             await Broadcast(e.Message); 
         }
 
-        public virtual Task Broadcast(Message message)
+        public Task Broadcast(Message message)
         {
             lock (locker)
             {
@@ -59,7 +59,7 @@
             return Task.CompletedTask;
         }
 
-        public virtual async Task Receive(Message message)
+        public async Task Receive(Message message)
         {
             if (_channels.ContainsKey(message.ChannelName))
             {

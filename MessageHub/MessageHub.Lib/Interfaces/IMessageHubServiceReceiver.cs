@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MessageHub.Interfaces
+﻿namespace MessageHub.Interfaces
 {
+    using System;
+    using System.Runtime.Serialization;
+    using System.ServiceModel;
+
     public interface IMessageHubServiceReceiver
     {
         [DataMember]
-        Guid Id { get; }
+        Guid Id { [OperationContract]get; }
+
+        [OperationContract]
+        void Receive(Guid hubId, Message message);
     }
 }

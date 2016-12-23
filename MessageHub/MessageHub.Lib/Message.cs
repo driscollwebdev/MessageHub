@@ -6,7 +6,7 @@
     using System.Runtime.Serialization.Formatters.Binary;
 
     [DataContract(Namespace = "")]
-    public class Message
+    public sealed class Message
     {
         [DataMember]
         public Guid Id { get; set; } = Guid.NewGuid();
@@ -24,9 +24,9 @@
         public string Data { get; set; }
 
         [DataMember]
-        public Type DataType { get; set; }
+        public string DataType { get; set; }
 
-        protected Message() { }
+        public Message() { }
 
         public static Message Create()
         {
@@ -59,7 +59,7 @@
                 bf.Serialize(ms, data);
                 byte[] serializedData = ms.ToArray();
                 Data = System.Convert.ToBase64String(serializedData);
-                DataType = data.GetType();
+                DataType = data.GetType().FullName;
             }
 
             return this;
