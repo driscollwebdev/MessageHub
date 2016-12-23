@@ -1,4 +1,4 @@
-﻿namespace MessageHub.Lib
+﻿namespace MessageHub.Hubs
 {
     using System;
     using System.Collections.Generic;
@@ -6,27 +6,30 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Collections.Concurrent;
 
-    public class MessageHub : IMessageHub
+    public class LocalMessageHub : IMessageHub
     {
-        private IDictionary<string, Channel> _channels = new Dictionary<string, Channel>();
+        private IDictionary<string, Channel> _channels = new ConcurrentDictionary<string, Channel>();
+
+        private object locker = new object();
 
         public event EventHandler<MessageEventArgs> Broadcasting;
 
         public Guid Id { get; } = Guid.NewGuid();
 
-        private MessageHub() { }
+        private LocalMessageHub() { }
 
         public static IMessageHub Create()
         {
-            return new MessageHub();
+            return new LocalMessageHub();
         }
 
         public Channel Channel(string name)
         {
             if (!_channels.ContainsKey(name))
             {
-                var channel = Lib.Channel.Create().WithName(name);
+                var channel = MessageHub.Channel.Create().WithName(name);
                 channel.MessageSending += Channel_MessageSending;
 
                 _channels[name] = channel;
@@ -49,7 +52,10 @@
 
         public virtual Task Broadcast(Message message)
         {
-            Broadcasting(this, new MessageEventArgs(message));
+            lock (locker)
+            {
+                Broadcasting(this, new MessageEventArgs(message));
+            }
             return Task.CompletedTask;
         }
 

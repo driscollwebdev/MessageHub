@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace MessageHub.Lib.Interfaces
+namespace MessageHub.Interfaces
 {
     public interface IMessageHub
     {

@@ -33,6 +33,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,8 +44,10 @@
   <ItemGroup>
     <Compile Include="Channel.cs" />
     <Compile Include="Interfaces\IMessageHub.cs" />
+    <Compile Include="Interfaces\IMessageHubService.cs" />
+    <Compile Include="Interfaces\IMessageHubServiceReceiver.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="MessageHub.cs" />
+    <Compile Include="Hubs\LocalMessageHub.cs" />
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

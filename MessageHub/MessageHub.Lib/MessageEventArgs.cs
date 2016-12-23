@@ -1,4 +1,4 @@
-﻿namespace MessageHub.Lib
+﻿namespace MessageHub
 {
     using System;
 

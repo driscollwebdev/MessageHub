@@ -1,4 +1,4 @@
-﻿namespace MessageHub.Lib
+﻿namespace MessageHub
 {
     using System;
     using System.IO;
@@ -8,6 +8,9 @@
     [DataContract(Namespace = "")]
     public class Message
     {
+        [DataMember]
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         [DataMember]
         public string Type { get; set; }
 

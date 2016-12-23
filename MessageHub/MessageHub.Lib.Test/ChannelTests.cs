@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MessageHub.Lib.Interfaces;
+using MessageHub.Interfaces;
+using System.Threading.Tasks;
 
 namespace MessageHub.Lib.Test
 {
@@ -34,6 +35,29 @@ namespace MessageHub.Lib.Test
 
             Assert.IsNotNull(test);
             Assert.AreEqual(id, test.Id);
+        }
+
+        [TestMethod]
+        public void ShouldHaveReceiverAfterAddReceiver()
+        {
+            var testChannel = Channel.Create();
+            Guid testRecGuid = testChannel.AddReceiver("test", (obj) => { return Task.CompletedTask; });
+
+            Assert.IsTrue(testChannel.HasReceiver("test", testRecGuid));
+        }
+
+        [TestMethod]
+        public void ShouldNotHaveReceiverAfterRemoveReceiver()
+        {
+            var testChannel = Channel.Create();
+            Guid testRecGuid = testChannel.AddReceiver("test", (obj) => { return Task.CompletedTask; });
+
+            Assert.IsTrue(testChannel.HasReceiver("test", testRecGuid));
+
+            bool isRemoved = testChannel.RemoveReceiver("test", testRecGuid);
+
+            Assert.IsTrue(isRemoved);
+            Assert.IsFalse(testChannel.HasReceiver("test", testRecGuid));
         }
     }
 }

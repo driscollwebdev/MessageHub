@@ -1,10 +1,12 @@
-﻿namespace MessageHub.Lib
+﻿namespace MessageHub
 {
     using Interfaces;
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -12,7 +14,7 @@
     /// </summary>
     public class Channel
     {
-        private IDictionary<string, IList<Receiver>> _receivers = new Dictionary<string, IList<Receiver>>();
+        private IDictionary<string, IEnumerable<Receiver>> _receivers = new ConcurrentDictionary<string, IEnumerable<Receiver>>();
 
         public event EventHandler<MessageEventArgs> MessageSending;
 
@@ -50,6 +52,16 @@
             await OnMessageSending(message);
         }
 
+        public bool HasReceiver(string messageType, Guid receiverGuid)
+        {
+            if (_receivers.ContainsKey(messageType))
+            {
+                return _receivers[messageType].Any(r => r.Id == receiverGuid);
+            }
+
+            return false;
+        }
+
         public Guid AddReceiver(string messageType, Func<object, Task> action)
         {
             Guid receiverGuid = Guid.NewGuid();
@@ -60,10 +72,10 @@
 
         public void AddReceiver(string messageType, Func<object, Task> action, Guid receiverGuid)
         {
-            IList<Receiver> recList = new List<Receiver>();
+            ConcurrentBag<Receiver> recList = new ConcurrentBag<Receiver>();
             if (_receivers.ContainsKey(messageType))
             {
-                recList = _receivers[messageType];
+                recList = _receivers[messageType] as ConcurrentBag<Receiver>;
             }
 
             recList.Add(new Receiver { Id = receiverGuid, MessageType = messageType, OnMessageReceived = action });
@@ -73,7 +85,21 @@
 
         public bool RemoveReceiver(string messageType, Guid receiverGuid)
         {
-            throw new NotImplementedException();
+            if (_receivers.ContainsKey(messageType))
+            {
+                Receiver receiver = _receivers[messageType].FirstOrDefault(r => r.Id == receiverGuid);
+                if (receiver != null)
+                {
+                    ConcurrentBag<Receiver> newReceivers = new ConcurrentBag<Receiver>(_receivers[messageType]);
+                    if (newReceivers.TryTake(out receiver))
+                    {
+                        _receivers[messageType] = newReceivers;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         internal async Task Receive(Message message)
