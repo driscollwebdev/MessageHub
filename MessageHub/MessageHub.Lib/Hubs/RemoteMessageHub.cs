@@ -28,7 +28,7 @@
             return _innerHub.Receive(message);
         }
 
-        private RemoteMessageHub(LocalMessageHub inner)
+        protected RemoteMessageHub(LocalMessageHub inner)
         {
             if (inner == null)
             {
@@ -38,6 +38,6 @@
             _innerHub = inner;
         }
 
-        private RemoteMessageHub() : this(null) { }
+        protected RemoteMessageHub() : this(null) { }
     }
 }

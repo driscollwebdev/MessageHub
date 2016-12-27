@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Wcf", "MessageHu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Wcf.Test", "MessageHub.Wcf.Test\MessageHub.Wcf.Test.csproj", "{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.SignalR", "MessageHub.SignalR\MessageHub.SignalR.csproj", "{292E2C3D-0792-441D-AE1F-CAF92E585CF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EE5AB52-78AF-4A0E-8C76-41D32F501A87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{292E2C3D-0792-441D-AE1F-CAF92E585CF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{292E2C3D-0792-441D-AE1F-CAF92E585CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{292E2C3D-0792-441D-AE1F-CAF92E585CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{292E2C3D-0792-441D-AE1F-CAF92E585CF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

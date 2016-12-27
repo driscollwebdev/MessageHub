@@ -10,7 +10,7 @@
         void Send(Guid fromHubId, Message message);
 
         [OperationContract]
-        void AddReceiver();
+        void AddReceiver(IMessageHubServiceReceiver receiver);
 
         [OperationContract]
         void RemoveReceiver(Guid receiverId);

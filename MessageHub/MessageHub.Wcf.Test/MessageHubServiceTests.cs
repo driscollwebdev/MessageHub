@@ -17,7 +17,7 @@ namespace MessageHub.Lib.Test
         [TestInitialize]
         public void Initialize()
         {
-            svc = new ServiceHost(typeof(MessageHubService));
+            svc = new ServiceHost(typeof(WcfMessageHubService));
             svc.AddServiceEndpoint(typeof(IMessageHubService), new NetTcpBinding(), "net.tcp://localhost:8000/TestHubService");
             svc.Open();
 
@@ -48,7 +48,7 @@ namespace MessageHub.Lib.Test
         [TestMethod]
         public void ShouldHaveReceiverAfterAddReceiver()
         {
-            client.AddReceiver();
+            client.AddReceiver(test);
             Assert.IsTrue(true);
         }
 
@@ -65,7 +65,7 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver();
+            client.AddReceiver(test);
             // simulate sending from a different client.
             client.Send(Guid.NewGuid(), Message.Create().WithType(messageType).WithData(messageData));
 
@@ -80,7 +80,7 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver();
+            client.AddReceiver(test);
             client.Send(test.Id, Message.Create().WithType(messageType).WithData(messageData));
 
             Assert.IsFalse(test.ReceiveCalled);

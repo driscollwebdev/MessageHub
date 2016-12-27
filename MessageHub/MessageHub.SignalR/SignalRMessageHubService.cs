@@ -1,21 +1,22 @@
-﻿namespace MessageHub.Wcf
+﻿namespace MessageHub.SignalR
 {
     using System;
     using Interfaces;
+    using Microsoft.AspNet.SignalR;
     using System.Collections.Concurrent;
     using System.Linq;
-    using System.ServiceModel;
+    using System.Collections.Generic;
 
-    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.Single)]
-    public sealed class MessageHubService : IMessageHubService
+    public class SignalRMessageHubService : Hub, IMessageHubService
     {
-        private ConcurrentBag<ConnectedClient> _clients = new ConcurrentBag<ConnectedClient>();
+        private const string ReceiverGroup = "__receivers";
+        private static ConcurrentBag<ConnectedClient> _clients = new ConcurrentBag<ConnectedClient>();
 
-        public void AddReceiver()
+        public void AddReceiver(IMessageHubServiceReceiver receiver)
         {
             ConnectedClient client = new ConnectedClient();
-            client.ClientCallback = OperationContext.Current.GetCallbackChannel<IMessageHubServiceReceiver>();
-            client.ClientId = client.ClientCallback.Id;
+            client.ConnectionId = Context.ConnectionId;
+            client.ClientId = receiver.Id;
 
             if (_clients.Any(c => c.ClientId == client.ClientId))
             {
@@ -23,6 +24,7 @@
             }
 
             _clients.Add(client);
+            Groups.Add(client.ConnectionId, ReceiverGroup);
         }
 
         public void RemoveReceiver(Guid receiverId)
@@ -34,6 +36,7 @@
                 ConcurrentBag<ConnectedClient> newClients = new ConcurrentBag<ConnectedClient>(_clients);
                 if (newClients.TryTake(out client))
                 {
+                    Groups.Remove(client.ConnectionId, ReceiverGroup);
                     _clients = newClients;
                 }
             }
@@ -41,22 +44,22 @@
 
         public void Send(Guid fromHubId, Message message)
         {
-            foreach (ConnectedClient client in _clients)
-            {
-                if (client.ClientId == fromHubId)
-                {
-                    continue;
-                }
+            ConnectedClient client = _clients.FirstOrDefault(c => c.ClientId == fromHubId);
+            string excludedClient = string.Empty;
 
-                client.ClientCallback.Receive(fromHubId, message);
+            if (client != null)
+            {
+                excludedClient = client.ConnectionId;
             }
+
+            Clients.Groups(new List<string> { { ReceiverGroup } }, excludedClient).Receive(fromHubId, message);
         }
 
         private class ConnectedClient
         {
             public Guid ClientId { get; set; }
 
-            public IMessageHubServiceReceiver ClientCallback { get; set; }
+            public string ConnectionId { get; set; }
         }
     }
 }
