@@ -50,6 +50,7 @@
     <Compile Include="Message.cs" />
     <Compile Include="Hubs\LocalMessageHub.cs" />
     <Compile Include="MessageEventArgs.cs" />
+    <Compile Include="MessageHubServiceReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

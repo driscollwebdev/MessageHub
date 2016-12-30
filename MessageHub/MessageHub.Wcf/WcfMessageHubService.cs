@@ -9,7 +9,20 @@
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.Single)]
     public sealed class WcfMessageHubService : IMessageHubService
     {
-        private ConcurrentBag<ConnectedClient> _clients = new ConcurrentBag<ConnectedClient>();
+        private Lazy<ConcurrentBag<ConnectedClient>> _clients = new Lazy<ConcurrentBag<ConnectedClient>>(() => new ConcurrentBag<ConnectedClient>(), true);
+
+        private ConcurrentBag<ConnectedClient> ConnectedClients
+        {
+            get
+            {
+                return _clients.Value;
+            }
+
+            set
+            {
+                _clients = new Lazy<ConcurrentBag<ConnectedClient>>(() => value, true);
+            }
+        }
 
         public void AddReceiver(IMessageHubServiceReceiver receiver)
         {
@@ -17,31 +30,31 @@
             client.ClientCallback = OperationContext.Current.GetCallbackChannel<IMessageHubServiceReceiver>();
             client.ClientId = client.ClientCallback.Id;
 
-            if (_clients.Any(c => c.ClientId == client.ClientId))
+            if (ConnectedClients.Any(c => c.ClientId == client.ClientId))
             {
                 RemoveReceiver(client.ClientId);
             }
 
-            _clients.Add(client);
+            ConnectedClients.Add(client);
         }
 
         public void RemoveReceiver(Guid receiverId)
         {
-            ConnectedClient client = _clients.FirstOrDefault(c => c.ClientId == receiverId);
+            ConnectedClient client = ConnectedClients.FirstOrDefault(c => c.ClientId == receiverId);
 
             if (client != null)
             {
-                ConcurrentBag<ConnectedClient> newClients = new ConcurrentBag<ConnectedClient>(_clients);
+                ConcurrentBag<ConnectedClient> newClients = new ConcurrentBag<ConnectedClient>(ConnectedClients);
                 if (newClients.TryTake(out client))
                 {
-                    _clients = newClients;
+                    ConnectedClients = newClients;
                 }
             }
         }
 
         public void Send(Guid fromHubId, Message message)
         {
-            foreach (ConnectedClient client in _clients)
+            foreach (ConnectedClient client in ConnectedClients)
             {
                 if (client.ClientId == fromHubId)
                 {

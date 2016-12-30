@@ -14,7 +14,15 @@
     /// </summary>
     public sealed class Channel
     {
-        private IDictionary<string, IEnumerable<Receiver>> _receivers = new ConcurrentDictionary<string, IEnumerable<Receiver>>();
+        private Lazy<IDictionary<string, IEnumerable<Receiver>>> _receivers = new Lazy<IDictionary<string, IEnumerable<Receiver>>>(() => new ConcurrentDictionary<string, IEnumerable<Receiver>>(), true);
+
+        private IDictionary<string, IEnumerable<Receiver>> Receivers
+        {
+            get
+            {
+                return _receivers.Value;
+            }
+        }
 
         public event EventHandler<MessageEventArgs> MessageSending;
 
@@ -54,9 +62,9 @@
 
         public bool HasReceiver(string messageType, Guid receiverGuid)
         {
-            if (_receivers.ContainsKey(messageType))
+            if (Receivers.ContainsKey(messageType))
             {
-                return _receivers[messageType].Any(r => r.Id == receiverGuid);
+                return Receivers[messageType].Any(r => r.Id == receiverGuid);
             }
 
             return false;
@@ -73,27 +81,27 @@
         public void AddReceiver(string messageType, Func<object, Task> action, Guid receiverGuid)
         {
             ConcurrentBag<Receiver> recList = new ConcurrentBag<Receiver>();
-            if (_receivers.ContainsKey(messageType))
+            if (Receivers.ContainsKey(messageType))
             {
-                recList = _receivers[messageType] as ConcurrentBag<Receiver>;
+                recList = Receivers[messageType] as ConcurrentBag<Receiver>;
             }
 
             recList.Add(new Receiver { Id = receiverGuid, MessageType = messageType, OnMessageReceived = action });
 
-            _receivers[messageType] = recList;
+            Receivers[messageType] = recList;
         }
 
         public bool RemoveReceiver(string messageType, Guid receiverGuid)
         {
-            if (_receivers.ContainsKey(messageType))
+            if (Receivers.ContainsKey(messageType))
             {
-                Receiver receiver = _receivers[messageType].FirstOrDefault(r => r.Id == receiverGuid);
+                Receiver receiver = Receivers[messageType].FirstOrDefault(r => r.Id == receiverGuid);
                 if (receiver != null)
                 {
-                    ConcurrentBag<Receiver> newReceivers = new ConcurrentBag<Receiver>(_receivers[messageType]);
+                    ConcurrentBag<Receiver> newReceivers = new ConcurrentBag<Receiver>(Receivers[messageType]);
                     if (newReceivers.TryTake(out receiver))
                     {
-                        _receivers[messageType] = newReceivers;
+                        Receivers[messageType] = newReceivers;
                         return true;
                     }
                 }
@@ -136,9 +144,9 @@
         {
             IList<Guid> instances = new List<Guid>();
 
-            if (_receivers.ContainsKey(messageType))
+            if (Receivers.ContainsKey(messageType))
             {
-                instances = _receivers[messageType].Select(r => r.Id).ToList();
+                instances = Receivers[messageType].Select(r => r.Id).ToList();
             }
 
             return instances;
@@ -148,9 +156,9 @@
         {
             IList<Func<object, Task>> actions = new List<Func<object, Task>>();
 
-            if (_receivers.ContainsKey(messageType))
+            if (Receivers.ContainsKey(messageType))
             {
-                actions = _receivers[messageType].Select(r => r.OnMessageReceived).ToList();
+                actions = Receivers[messageType].Select(r => r.OnMessageReceived).ToList();
             }
 
             return actions;

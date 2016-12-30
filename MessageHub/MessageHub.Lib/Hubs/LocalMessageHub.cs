@@ -10,7 +10,15 @@
 
     public sealed class LocalMessageHub : IMessageHub
     {
-        private IDictionary<string, Channel> _channels = new ConcurrentDictionary<string, Channel>();
+        private Lazy<IDictionary<string, Channel>> _channels = new Lazy<IDictionary<string, Channel>>(() => new ConcurrentDictionary<string, Channel>(), true);
+
+        private IDictionary<string, Channel> Channels
+        {
+            get
+            {
+                return _channels.Value;
+            }
+        }
 
         private object locker = new object();
 
@@ -27,22 +35,22 @@
 
         public Channel Channel(string name)
         {
-            if (!_channels.ContainsKey(name))
+            if (!Channels.ContainsKey(name))
             {
                 var channel = MessageHub.Channel.Create().WithName(name);
                 channel.MessageSending += Channel_MessageSending;
 
-                _channels[name] = channel;
+                Channels[name] = channel;
             }
 
-            return _channels[name];
+            return Channels[name];
         }
 
         private async void Channel_MessageSending(object sender, MessageEventArgs e)
         {
             Channel sendingChannel = sender as Channel;
 
-            if (sendingChannel == null || !_channels.Values.Any(c => c.Id == sendingChannel.Id))
+            if (sendingChannel == null || !Channels.Values.Any(c => c.Id == sendingChannel.Id))
             {
                 return;
             }
@@ -61,9 +69,9 @@
 
         public async Task Receive(Message message)
         {
-            if (_channels.ContainsKey(message.ChannelName))
+            if (Channels.ContainsKey(message.ChannelName))
             {
-                await _channels[message.ChannelName].Receive(message);
+                await Channels[message.ChannelName].Receive(message);
             }
         }
     }

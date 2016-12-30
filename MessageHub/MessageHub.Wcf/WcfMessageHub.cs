@@ -37,7 +37,7 @@
         public IMessageHub WithRemote(IMessageHubService remote)
         {
             _proxy = remote;
-            _proxy.AddReceiver(this);
+            _proxy.AddReceiver(null);
 
             return this;
         }

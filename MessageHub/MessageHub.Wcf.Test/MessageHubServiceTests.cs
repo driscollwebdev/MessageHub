@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MessageHub.Interfaces;
 using MessageHub.Wcf;
 using System.ServiceModel;
+using System.Runtime.Serialization;
+using System.Xml;
 
 namespace MessageHub.Lib.Test
 {
@@ -48,7 +50,7 @@ namespace MessageHub.Lib.Test
         [TestMethod]
         public void ShouldHaveReceiverAfterAddReceiver()
         {
-            client.AddReceiver(test);
+            client.AddReceiver(null);
             Assert.IsTrue(true);
         }
 
@@ -65,7 +67,7 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver(test);
+            client.AddReceiver(null);
             // simulate sending from a different client.
             client.Send(Guid.NewGuid(), Message.Create().WithType(messageType).WithData(messageData));
 
@@ -80,7 +82,7 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver(test);
+            client.AddReceiver(null);
             client.Send(test.Id, Message.Create().WithType(messageType).WithData(messageData));
 
             Assert.IsFalse(test.ReceiveCalled);
@@ -99,18 +101,31 @@ namespace MessageHub.Lib.Test
             Assert.IsNull(test.RemoteMessage);
         }
 
-        private class TestServiceReceiver : IMessageHubServiceReceiver
+        [DataContract(Namespace = "")]
+        private class TestServiceReceiver : MessageHubServiceReceiver
         {
-            public Guid Id { get; } = Guid.NewGuid();
-
             public bool ReceiveCalled { get; private set; }
 
             public Message RemoteMessage { get; private set; }
 
-            public void Receive(Guid hubId, Message message)
+            [OperationContract]
+            public override void Receive(Guid hubId, Message message)
             {
                 ReceiveCalled = true;
                 RemoteMessage = message;
+            }
+        }
+
+        private class TestServiceReceiverResolver : DataContractResolver
+        {
+            public override Type ResolveName(string typeName, string typeNamespace, Type declaredType, DataContractResolver knownTypeResolver)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override bool TryResolveType(Type type, Type declaredType, DataContractResolver knownTypeResolver, out XmlDictionaryString typeName, out XmlDictionaryString typeNamespace)
+            {
+                throw new NotImplementedException();
             }
         }
     }
