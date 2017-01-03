@@ -24,22 +24,29 @@
             base.Receive(message);
         }
 
-        public static IMessageHub Create()
+        public static SignalRMessageHub Create()
         {
             return new SignalRMessageHub();
         }
 
-        public static IMessageHub Create(LocalMessageHub inner)
+        public static SignalRMessageHub Create(LocalMessageHub inner)
         {
             return new SignalRMessageHub(inner);
         }
 
-        public IMessageHub WithRemote(IHubProxy remote)
+        public SignalRMessageHub WithRemote(IHubProxy remote)
         {
             _proxy = remote;
             _proxy.On<Guid, Message>("Receive", (fromHubId, message) => Receive(fromHubId, message));
 
+            _proxy.Invoke<IMessageHubServiceReceiver>("AddReceiver", this);
+
             return this;
+        }
+
+        public void Disconnect()
+        {
+            _proxy.Invoke<Guid>("RemoveReceiver", this.Id);
         }
     }
 }

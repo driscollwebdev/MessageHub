@@ -36,6 +36,7 @@
             }
 
             _innerHub = inner;
+            _innerHub.Broadcasting += (s, e) => Broadcast(e.Message);
         }
 
         protected RemoteMessageHub() : this(null) { }

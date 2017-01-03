@@ -26,11 +26,11 @@
             }
         }
 
-        public void AddReceiver(IMessageHubServiceReceiver receiver)
+        public void AddReceiver(Guid receiverId)
         {
             ConnectedClient client = new ConnectedClient();
             client.ConnectionId = Context.ConnectionId;
-            client.ClientId = receiver.Id;
+            client.ClientId = receiverId;
 
             if (ConnectedClients.Any(c => c.ClientId == client.ClientId))
             {

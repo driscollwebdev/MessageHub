@@ -19,9 +19,9 @@ namespace MessageHub.SignalR.Test
             var mockGroups = new Mock<IGroupManager>();
             hub.Groups = mockGroups.Object;
 
-            var receiver = new Mock<IMessageHubServiceReceiver>();
+            var receiverId = Guid.NewGuid();
 
-            hub.AddReceiver(receiver.Object);
+            hub.AddReceiver(receiverId);
             mockGroups.Verify(m => m.Add(It.IsAny<string>(), "__receivers"), Times.Once);
         }
 
@@ -34,13 +34,11 @@ namespace MessageHub.SignalR.Test
             var mockGroups = new Mock<IGroupManager>();
             hub.Groups = mockGroups.Object;
 
-            var receiver = new Mock<IMessageHubServiceReceiver>();
             Guid recGuid = Guid.NewGuid();
-            receiver.SetupGet(r => r.Id).Returns(recGuid);
 
-            hub.AddReceiver(receiver.Object);
+            hub.AddReceiver(recGuid);
 
-            hub.RemoveReceiver(receiver.Object.Id);
+            hub.RemoveReceiver(recGuid);
 
             mockGroups.Verify(m => m.Remove(It.IsAny<string>(), "__receivers"), Times.Once);
         }
@@ -83,7 +81,7 @@ namespace MessageHub.SignalR.Test
             var receiver = new Mock<IMessageHubServiceReceiver>();
             Guid excludedGuid = Guid.NewGuid();
             receiver.SetupGet(r => r.Id).Returns(excludedGuid);
-            hub.AddReceiver(receiver.Object);
+            hub.AddReceiver(excludedGuid);
             hub.Send(excludedGuid, Message.Create().WithData("Test"));
             receiver.Verify(r => r.Receive(excludedGuid, It.IsAny<Message>()), Times.Never);
         }

@@ -50,7 +50,7 @@ namespace MessageHub.Lib.Test
         [TestMethod]
         public void ShouldHaveReceiverAfterAddReceiver()
         {
-            client.AddReceiver(null);
+            client.AddReceiver(Guid.NewGuid());
             Assert.IsTrue(true);
         }
 
@@ -67,7 +67,7 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver(null);
+            client.AddReceiver(test.Id);
             // simulate sending from a different client.
             client.Send(Guid.NewGuid(), Message.Create().WithType(messageType).WithData(messageData));
 
@@ -82,7 +82,7 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver(null);
+            client.AddReceiver(test.Id);
             client.Send(test.Id, Message.Create().WithType(messageType).WithData(messageData));
 
             Assert.IsFalse(test.ReceiveCalled);

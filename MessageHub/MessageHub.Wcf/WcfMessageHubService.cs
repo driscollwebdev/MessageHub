@@ -24,7 +24,7 @@
             }
         }
 
-        public void AddReceiver(IMessageHubServiceReceiver receiver)
+        public void AddReceiver(Guid receiverId)
         {
             ConnectedClient client = new ConnectedClient();
             client.ClientCallback = OperationContext.Current.GetCallbackChannel<IMessageHubServiceReceiver>();

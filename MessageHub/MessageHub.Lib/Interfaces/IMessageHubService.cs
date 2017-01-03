@@ -7,10 +7,10 @@
     public interface IMessageHubService
     {
         [OperationContract]
-        void Send(Guid fromHubId, Message message);
+        void Send(Guid senderId, Message message);
 
         [OperationContract]
-        void AddReceiver(IMessageHubServiceReceiver receiver);
+        void AddReceiver(Guid receiverId);
 
         [OperationContract]
         void RemoveReceiver(Guid receiverId);
