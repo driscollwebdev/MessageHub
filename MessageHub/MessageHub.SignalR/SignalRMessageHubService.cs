@@ -39,6 +39,12 @@
 
             ConnectedClients.Add(client);
             Groups.Add(client.ConnectionId, ReceiverGroup);
+
+            OnConnectedClientAdded(client);
+        }
+
+        protected virtual void OnConnectedClientAdded(ConnectedClient client)
+        {
         }
 
         public void RemoveReceiver(Guid receiverId)
@@ -54,6 +60,12 @@
                     ConnectedClients = newClients;
                 }
             }
+
+            OnConnectedClientRemoved(client);
+        }
+
+        protected virtual void OnConnectedClientRemoved(ConnectedClient client)
+        {
         }
 
         public void Send(Guid fromHubId, Message message)
@@ -73,7 +85,11 @@
             }
         }
 
-        private class ConnectedClient
+        protected virtual void OnSend(Guid senderId, Message message)
+        {
+        }
+
+        protected class ConnectedClient
         {
             public Guid ClientId { get; set; }
 

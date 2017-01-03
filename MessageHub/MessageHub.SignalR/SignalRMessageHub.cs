@@ -39,7 +39,7 @@
             _proxy = remote;
             _proxy.On<Guid, Message>("Receive", (fromHubId, message) => Receive(fromHubId, message));
 
-            _proxy.Invoke<IMessageHubServiceReceiver>("AddReceiver", this);
+            _proxy.Invoke<Guid>("AddReceiver", Id);
 
             return this;
         }

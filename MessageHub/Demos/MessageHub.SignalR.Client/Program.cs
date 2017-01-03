@@ -18,7 +18,7 @@ namespace MessageHub.SignalR.Client
 
             IMessageHub msgHub = SignalRMessageHub.Create().WithRemote(demoHubProxy);
 
-            msgHub.Channel("Default").AddReceiver("public", (msg) =>
+            Guid userGuid = msgHub.Channel("Default").AddReceiver("public", (msg) =>
             {
                 ChatMessage message = msg as ChatMessage;
                 if (message != null)
@@ -35,6 +35,14 @@ namespace MessageHub.SignalR.Client
 
             Console.WriteLine($"Welcome, {username}");
 
+            ChatMessage joined = new ChatMessage
+            {
+                Username = "admin",
+                MessageText = $"{username} has joined."
+            };
+
+            msgHub.Channel("Default").Send("public", joined).Wait();
+
             string outgoingMessage = Console.ReadLine();
             while (outgoingMessage != CMD_EXIT && outgoingMessage != CMD_QUIT)
             {
@@ -48,6 +56,16 @@ namespace MessageHub.SignalR.Client
 
                 outgoingMessage = Console.ReadLine();
             }
+
+            msgHub.Channel("Default").RemoveReceiver("public", userGuid);
+
+            ChatMessage left = new ChatMessage
+            {
+                Username = "admin",
+                MessageText = $"{username} has left."
+            };
+
+            msgHub.Channel("Default").Send("public", left).Wait();
 
             ((SignalRMessageHub)msgHub).Disconnect();
             connection.Stop();
