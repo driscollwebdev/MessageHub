@@ -44,7 +44,7 @@
             return this;
         }
 
-        public void Disconnect()
+        public override void Disconnect()
         {
             _proxy.Invoke<Guid>("RemoveReceiver", this.Id);
         }

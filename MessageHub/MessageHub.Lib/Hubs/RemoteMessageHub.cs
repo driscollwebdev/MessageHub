@@ -28,6 +28,10 @@
             return _innerHub.Receive(message);
         }
 
+        public virtual void Disconnect()
+        {
+        }
+
         protected RemoteMessageHub(LocalMessageHub inner)
         {
             if (inner == null)

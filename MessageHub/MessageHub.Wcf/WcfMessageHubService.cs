@@ -5,6 +5,7 @@
     using System.Collections.Concurrent;
     using System.Linq;
     using System.ServiceModel;
+    using System.Collections.Generic;
 
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.Single)]
     public sealed class WcfMessageHubService : IMessageHubService
@@ -54,14 +55,23 @@
 
         public void Send(Guid fromHubId, Message message)
         {
-            foreach (ConnectedClient client in ConnectedClients)
-            {
-                if (client.ClientId == fromHubId)
-                {
-                    continue;
-                }
+            List<ConnectedClient> receivers = ConnectedClients.ToList();
 
-                client.ClientCallback.Receive(fromHubId, message);
+            foreach (ConnectedClient client in receivers)
+            {
+                try
+                {
+                    if (client.ClientId == fromHubId)
+                    {
+                        continue;
+                    }
+
+                    client.ClientCallback.Receive(fromHubId, message);
+                }
+                catch
+                {
+                    RemoveReceiver(client.ClientId);
+                }
             }
         }
 

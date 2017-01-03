@@ -1,10 +1,14 @@
 ﻿using MessageHub.Hubs;
 using MessageHub.Interfaces;
-using Microsoft.AspNet.SignalR.Client;
+using MessageHub.Wcf;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.ServiceModel;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace MessageHub.SignalR.Client
+namespace MessageHub.Wcf.Client
 {
     class Program
     {
@@ -13,11 +17,12 @@ namespace MessageHub.SignalR.Client
 
         static void Main(string[] args)
         {
-            HubConnection connection = new HubConnection("http://localhost:8088/messagehub/");
-            IHubProxy demoHubProxy = connection.CreateHubProxy("DemoHub");
-            connection.Start().Wait();
+            WcfMessageHub msgHub = WcfMessageHub.Create();
 
-            IMessageHub msgHub = SignalRMessageHub.Create().WithRemote(demoHubProxy);
+            DuplexChannelFactory<IMessageHubService> svcChannel = new DuplexChannelFactory<IMessageHubService>(msgHub, new NetTcpBinding(), new EndpointAddress("net.tcp://localhost:9099/DemoHub"));
+            IMessageHubService demoHubProxy = svcChannel.CreateChannel();
+
+            msgHub.WithRemote(demoHubProxy);
 
             Guid userGuid = msgHub.Channel("Default").AddReceiver("public", (msg) =>
             {
@@ -69,7 +74,7 @@ namespace MessageHub.SignalR.Client
             msgHub.Channel("Default").Send("public", left).Wait();
 
             ((RemoteMessageHub)msgHub).Disconnect();
-            connection.Stop();
+            svcChannel.Close();
         }
     }
 }

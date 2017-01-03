@@ -24,22 +24,27 @@
             base.Receive(message);
         }
 
-        public static IMessageHub Create()
+        public static WcfMessageHub Create()
         {
             return new WcfMessageHub();
         }
 
-        public static IMessageHub Create(LocalMessageHub inner)
+        public static WcfMessageHub Create(LocalMessageHub inner)
         {
             return new WcfMessageHub(inner);
         }
 
-        public IMessageHub WithRemote(IMessageHubService remote)
+        public WcfMessageHub WithRemote(IMessageHubService remote)
         {
             _proxy = remote;
             _proxy.AddReceiver(Id);
 
             return this;
+        }
+
+        public override void Disconnect()
+        {
+            _proxy.RemoveReceiver(Id);
         }
     }
 }
