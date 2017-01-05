@@ -1,12 +1,9 @@
 ﻿namespace MessageHub
 {
-    using Interfaces;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -51,11 +48,14 @@
 
         public async Task Send<TData>(string messageType, TData data)
         {
-            Message message = Message.Create()
-                                     .FromChannelId(Id)
-                                     .ToChannelName(Name)
-                                     .WithType(messageType)
-                                     .WithData(data);
+            Message message = CreateMessage(messageType).WithData(data);
+
+            await OnMessageSending(message);
+        }
+
+        public async Task Send<TData>(string messageType, TData data, SerializationType serializationType)
+        {
+            Message message = CreateMessage(messageType).WithData(data, serializationType);
 
             await OnMessageSending(message);
         }
@@ -134,22 +134,18 @@
             await Task.WhenAll(tasks); 
         }
 
+        private Message CreateMessage(string messageType)
+        {
+            return Message.Create()
+                          .FromChannelId(Id)
+                          .ToChannelName(Name)
+                          .WithType(messageType);
+        }
+
         private async Task OnMessageSending(Message message)
         {
             MessageSending(this, new MessageEventArgs(message));
             await Receive(message);
-        }
-
-        private IList<Guid> GetReceiverIds(string messageType)
-        {
-            IList<Guid> instances = new List<Guid>();
-
-            if (Receivers.ContainsKey(messageType))
-            {
-                instances = Receivers[messageType].Select(r => r.Id).ToList();
-            }
-
-            return instances;
         }
 
         private IList<Func<object, Task>> GetReceiverActions(string messageType)
