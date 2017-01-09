@@ -13,12 +13,12 @@ namespace MessageHub.SignalR.Client
 
         static void Main(string[] args)
         {
-            HubConnection connection = new HubConnection("http://localhost:8088/messagehub/");
-            IHubProxy demoHubProxy = connection.CreateHubProxy("DemoHub");
-            connection.Start().Wait();
+            RemoteMessageHub msgHub = SignalRMessageHub.Create()
+                                                  .WithRemoteEndpoint("http://localhost:8088/messagehub/")
+                                                  .WithHubName("DemoHub");
 
-            IMessageHub msgHub = SignalRMessageHub.Create().WithRemote(demoHubProxy);
-
+            msgHub.Connect().Wait();
+                                                  
             Guid userGuid = msgHub.Channel("Default").AddReceiver("public", (msg) =>
             {
                 ChatMessage message = msg as ChatMessage;
@@ -68,8 +68,7 @@ namespace MessageHub.SignalR.Client
 
             msgHub.Channel("Default").Send("public", left).Wait();
 
-            ((RemoteMessageHub)msgHub).Disconnect();
-            connection.Stop();
+            msgHub.Disconnect();
         }
     }
 }

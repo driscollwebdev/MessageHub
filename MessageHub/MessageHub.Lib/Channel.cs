@@ -46,18 +46,18 @@
             return this;
         }
 
-        public async Task Send<TData>(string messageType, TData data)
+        public Task Send<TData>(string messageType, TData data)
         {
             Message message = CreateMessage(messageType).WithData(data);
 
-            await OnMessageSending(message);
+            return OnMessageSending(message);
         }
 
-        public async Task Send<TData>(string messageType, TData data, SerializationType serializationType)
+        public Task Send<TData>(string messageType, TData data, SerializationType serializationType)
         {
             Message message = CreateMessage(messageType).WithData(data, serializationType);
 
-            await OnMessageSending(message);
+            return OnMessageSending(message);
         }
 
         public bool HasReceiver(string messageType, Guid receiverGuid)
@@ -110,16 +110,16 @@
             return false;
         }
 
-        internal async Task Receive(Message message)
+        internal Task Receive(Message message)
         {
             if (message.ChannelName != Name)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (string.IsNullOrWhiteSpace(message.Type))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             var receiverActions = GetReceiverActions(message.Type);
@@ -131,7 +131,7 @@
                 tasks.Add(actionCopy(message.GetDataObject()));
             }
 
-            await Task.WhenAll(tasks); 
+            return Task.WhenAll(tasks); 
         }
 
         private Message CreateMessage(string messageType)
@@ -142,10 +142,10 @@
                           .WithType(messageType);
         }
 
-        private async Task OnMessageSending(Message message)
+        private Task OnMessageSending(Message message)
         {
             MessageSending(this, new MessageEventArgs(message));
-            await Receive(message);
+            return Receive(message);
         }
 
         private IList<Func<object, Task>> GetReceiverActions(string messageType)

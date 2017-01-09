@@ -115,12 +115,14 @@
         /// </summary>
         /// <param name="message">The message to receive</param>
         /// <returns>A task for continuation purposes</returns>
-        public async Task Receive(Message message)
+        public Task Receive(Message message)
         {
             if (Channels.ContainsKey(message.ChannelName))
             {
-                await Channels[message.ChannelName].Receive(message);
+                return Channels[message.ChannelName].Receive(message);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

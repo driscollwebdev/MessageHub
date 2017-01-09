@@ -17,12 +17,11 @@ namespace MessageHub.Wcf.Client
 
         static void Main(string[] args)
         {
-            WcfMessageHub msgHub = WcfMessageHub.Create();
+            RemoteMessageHub msgHub = WcfMessageHub.Create()
+                                                .WithRemoteEndpoint("net.tcp://localhost:9099/DemoHub")
+                                                .WithBinding(new NetTcpBinding());
 
-            DuplexChannelFactory<IMessageHubService> svcChannel = new DuplexChannelFactory<IMessageHubService>(msgHub, new NetTcpBinding(), new EndpointAddress("net.tcp://localhost:9099/DemoHub"));
-            IMessageHubService demoHubProxy = svcChannel.CreateChannel();
-
-            msgHub.WithRemote(demoHubProxy);
+            msgHub.Connect().Wait();
 
             Guid userGuid = msgHub.Channel("Default").AddReceiver("public", (msg) =>
             {
@@ -73,8 +72,7 @@ namespace MessageHub.Wcf.Client
 
             msgHub.Channel("Default").Send("public", left).Wait();
 
-            ((RemoteMessageHub)msgHub).Disconnect();
-            svcChannel.Close();
+            msgHub.Disconnect();
         }
     }
 }

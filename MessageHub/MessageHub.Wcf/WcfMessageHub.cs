@@ -4,9 +4,13 @@
     using System.Threading.Tasks;
     using Hubs;
     using Interfaces;
+    using System.ServiceModel;
 
     public sealed class WcfMessageHub : RemoteMessageHub, IMessageHub, IMessageHubServiceReceiver
     {
+        private string _remoteUri;
+        private DuplexChannelFactory<IMessageHubService> _channelFactory;
+        private System.ServiceModel.Channels.Binding _channelBinding;
         private IMessageHubService _proxy;
 
         private WcfMessageHub() : base() { }
@@ -34,17 +38,38 @@
             return new WcfMessageHub(inner);
         }
 
-        public WcfMessageHub WithRemote(IMessageHubService remote)
+        public WcfMessageHub WithRemoteEndpoint(string uri)
         {
-            _proxy = remote;
-            _proxy.AddReceiver(Id);
+            _remoteUri = uri;
 
             return this;
+        }
+
+        public WcfMessageHub WithBinding(System.ServiceModel.Channels.Binding binding)
+        {
+            _channelBinding = binding;
+
+            return this;
+        }
+
+        public override Task Connect()
+        {
+            if (_channelFactory != null && _channelFactory.State == CommunicationState.Opened)
+            {
+                return Task.CompletedTask;
+            }
+
+            _channelFactory = new DuplexChannelFactory<IMessageHubService>(this, _channelBinding, new EndpointAddress(_remoteUri));
+            _proxy = _channelFactory.CreateChannel();
+            _proxy.AddReceiver(Id);
+
+            return Task.CompletedTask;
         }
 
         public override void Disconnect()
         {
             _proxy.RemoveReceiver(Id);
+            _channelFactory.Close();
         }
     }
 }

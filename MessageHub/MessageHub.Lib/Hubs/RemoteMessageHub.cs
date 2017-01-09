@@ -52,6 +52,11 @@
             return _innerHub.Receive(message);
         }
 
+        public virtual Task Connect()
+        {
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         /// Disconnects this hub from the remote service, performing any necessary cleanup tasks.
         /// </summary>
