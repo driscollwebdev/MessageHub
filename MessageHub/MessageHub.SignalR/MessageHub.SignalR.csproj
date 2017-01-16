@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HubConnectedClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalRMessageHub.cs" />
     <Compile Include="SignalRMessageHubService.cs" />

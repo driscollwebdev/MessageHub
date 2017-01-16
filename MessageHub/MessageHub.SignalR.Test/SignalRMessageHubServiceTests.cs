@@ -4,6 +4,7 @@ using Moq;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using MessageHub.Interfaces;
+using MessageHub.Repositories;
 
 namespace MessageHub.SignalR.Test
 {
@@ -13,7 +14,8 @@ namespace MessageHub.SignalR.Test
         [TestMethod]
         public void ShouldHaveReceiverAfterAddReceiver()
         {
-            var hub = new SignalRMessageHubService();
+            var mockRepo = new Mock<IConnectedClientRepository<HubConnectedClient>>();
+            var hub = new SignalRMessageHubService(mockRepo.Object);
             var mockRequest = new Mock<IRequest>();
             hub.Context = new HubCallerContext(mockRequest.Object, "123");
             var mockGroups = new Mock<IGroupManager>();
@@ -28,7 +30,8 @@ namespace MessageHub.SignalR.Test
         [TestMethod]
         public void ShouldNotHaveReceiverAfterRemoveReceiver()
         {
-            var hub = new SignalRMessageHubService();
+            var mockRepo = new AppConnectedClientRepository<HubConnectedClient>();
+            var hub = new SignalRMessageHubService(mockRepo);
             var mockRequest = new Mock<IRequest>();
             hub.Context = new HubCallerContext(mockRequest.Object, "123");
             var mockGroups = new Mock<IGroupManager>();
@@ -50,7 +53,8 @@ namespace MessageHub.SignalR.Test
 
             try
             {
-                var hub = new SignalRMessageHubService();
+                var mockRepo = new Mock<IConnectedClientRepository<HubConnectedClient>>();
+                var hub = new SignalRMessageHubService(mockRepo.Object);
                 var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
                 var all = new Mock<IMessageHubServiceReceiver>();
                 hub.Clients = mockClients.Object;
@@ -70,7 +74,8 @@ namespace MessageHub.SignalR.Test
         [TestMethod]
         public void ShouldNotTriggerReceiveCallbackFromSameHubId()
         {
-            var hub = new SignalRMessageHubService();
+            var mockRepo = new Mock<IConnectedClientRepository<HubConnectedClient>>();
+            var hub = new SignalRMessageHubService(mockRepo.Object);
             var mockRequest = new Mock<IRequest>();
             hub.Context = new HubCallerContext(mockRequest.Object, "123");
             var mockGroups = new Mock<IGroupManager>();
@@ -89,7 +94,8 @@ namespace MessageHub.SignalR.Test
         [TestMethod]
         public void ShouldNotTriggerReceiveCallbackIfNotAddedFirst()
         {
-            var hub = new SignalRMessageHubService();
+            var mockRepo = new Mock<IConnectedClientRepository<HubConnectedClient>>();
+            var hub = new SignalRMessageHubService(mockRepo.Object);
             var mockRequest = new Mock<IRequest>();
             hub.Context = new HubCallerContext(mockRequest.Object, "123");
             var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();

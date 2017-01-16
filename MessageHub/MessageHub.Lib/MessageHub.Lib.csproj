@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
@@ -48,6 +49,8 @@
   <ItemGroup>
     <Compile Include="Channel.cs" />
     <Compile Include="Hubs\RemoteMessageHub.cs" />
+    <Compile Include="Interfaces\IConnectedClient.cs" />
+    <Compile Include="Interfaces\IConnectedClientRepository.cs" />
     <Compile Include="Interfaces\IMessageHub.cs" />
     <Compile Include="Interfaces\IMessageHubService.cs" />
     <Compile Include="Interfaces\IMessageHubServiceReceiver.cs" />
@@ -56,11 +59,13 @@
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="MessageHubServiceReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\AppConnectedClientRepository.cs" />
     <Compile Include="SerializationTypes.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

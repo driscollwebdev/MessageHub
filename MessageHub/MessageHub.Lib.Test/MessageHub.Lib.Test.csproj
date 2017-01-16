@@ -67,6 +67,7 @@
     <Compile Include="LocalMessageHubTests.cs" />
     <Compile Include="ChannelTests.cs" />
     <Compile Include="MessageTests.cs" />
+    <Compile Include="AppConnectedClientRepositoryTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MessageHub.Lib\MessageHub.Lib.csproj">

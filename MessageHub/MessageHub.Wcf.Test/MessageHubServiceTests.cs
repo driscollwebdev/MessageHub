@@ -5,6 +5,7 @@ using MessageHub.Wcf;
 using System.ServiceModel;
 using System.Runtime.Serialization;
 using System.Xml;
+using MessageHub.Repositories;
 
 namespace MessageHub.Lib.Test
 {
@@ -19,7 +20,10 @@ namespace MessageHub.Lib.Test
         [TestInitialize]
         public void Initialize()
         {
-            svc = new ServiceHost(typeof(WcfMessageHubService));
+            IConnectedClientRepository<WcfConnectedClient> repo = new AppConnectedClientRepository<WcfConnectedClient>();
+            WcfMessageHubService instance = new WcfMessageHubService(repo);
+
+            svc = new ServiceHost(instance);
             svc.AddServiceEndpoint(typeof(IMessageHubService), new NetTcpBinding(), "net.tcp://localhost:8000/TestHubService");
             svc.Open();
 

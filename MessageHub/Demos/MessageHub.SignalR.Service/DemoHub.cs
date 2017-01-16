@@ -1,17 +1,22 @@
-﻿using System;
+﻿using MessageHub.Interfaces;
+using System;
 
 namespace MessageHub.SignalR.Service
 {
     public class DemoHub : SignalRMessageHubService
     {
-        protected override void OnConnectedClientAdded(ConnectedClient client)
+        public DemoHub(IConnectedClientRepository<HubConnectedClient> clients)
+            : base(clients)
         {
-            Console.WriteLine($"Client with Id {client.ClientId} joined on connection id {client.ConnectionId}.");
+        }
+        protected override void OnConnectedClientAdded(HubConnectedClient client)
+        {
+            Console.WriteLine($"Client with Id {client.Id} joined on connection id {client.ConnectionId}.");
         }
 
-        protected override void OnConnectedClientRemoved(ConnectedClient client)
+        protected override void OnConnectedClientRemoved(HubConnectedClient client)
         {
-            Console.WriteLine($"Client with Id {client.ClientId} disconnected.");
+            Console.WriteLine($"Client with Id {client.Id} disconnected.");
         }
     }
 }

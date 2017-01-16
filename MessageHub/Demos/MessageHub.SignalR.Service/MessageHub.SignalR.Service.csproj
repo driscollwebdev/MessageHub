@@ -93,6 +93,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\MessageHub.Lib\MessageHub.Lib.csproj">
+      <Project>{3BBBCEC1-3C7C-42A8-BB80-E1FB221B225B}</Project>
+      <Name>MessageHub.Lib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\MessageHub.SignalR\MessageHub.SignalR.csproj">
       <Project>{292e2c3d-0792-441d-ae1f-caf92e585cf5}</Project>
       <Name>MessageHub.SignalR</Name>

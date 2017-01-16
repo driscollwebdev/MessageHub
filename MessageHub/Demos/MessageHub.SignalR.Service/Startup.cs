@@ -1,4 +1,6 @@
-﻿using Microsoft.Owin;
+﻿using MessageHub.Repositories;
+using Microsoft.AspNet.SignalR;
+using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Owin;
 
@@ -9,6 +11,9 @@ namespace MessageHub.SignalR.Service
     {
         public void Configuration(IAppBuilder app)
         {
+            GlobalHost.DependencyResolver.Register(typeof(DemoHub),
+                () => new DemoHub(new AppConnectedClientRepository<HubConnectedClient>()));
+
             app.Map("/messagehub", map => {
                 map.UseCors(CorsOptions.AllowAll);
 

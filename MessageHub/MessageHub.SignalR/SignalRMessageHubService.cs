@@ -11,66 +11,57 @@
     {
         private const string ReceiverGroup = "__receivers";
 
-        private static Lazy<ConcurrentBag<ConnectedClient>> _clients = new Lazy<ConcurrentBag<ConnectedClient>>(() => new ConcurrentBag<ConnectedClient>(), true);
+        private IConnectedClientRepository<HubConnectedClient> _clients;
 
-        private static ConcurrentBag<ConnectedClient> ConnectedClients
+        public SignalRMessageHubService(IConnectedClientRepository<HubConnectedClient> clients)
         {
-            get
-            {
-                return _clients.Value;
-            }
-
-            set
-            {
-                _clients = new Lazy<ConcurrentBag<ConnectedClient>>(() => value, true);
-            }
+            _clients = clients;
         }
 
         public void AddReceiver(Guid receiverId)
         {
-            ConnectedClient client = new ConnectedClient();
+            HubConnectedClient client = new HubConnectedClient();
             client.ConnectionId = Context.ConnectionId;
-            client.ClientId = receiverId;
+            client.Id = receiverId;
 
-            if (ConnectedClients.Any(c => c.ClientId == client.ClientId))
+            HubConnectedClient existing = _clients.Single(receiverId);
+
+            if (existing != null)
             {
-                RemoveReceiver(client.ClientId);
+                Groups.Remove(existing.ConnectionId, ReceiverGroup);
+                _clients.Remove(receiverId);
             }
 
-            ConnectedClients.Add(client);
+            _clients.Add(client);
             Groups.Add(client.ConnectionId, ReceiverGroup);
 
             OnConnectedClientAdded(client);
         }
 
-        protected virtual void OnConnectedClientAdded(ConnectedClient client)
+        protected virtual void OnConnectedClientAdded(HubConnectedClient client)
         {
         }
 
         public void RemoveReceiver(Guid receiverId)
         {
-            ConnectedClient client = ConnectedClients.FirstOrDefault(c => c.ClientId == receiverId);
+            HubConnectedClient client = _clients.Single(receiverId);
 
             if (client != null)
             {
-                ConcurrentBag<ConnectedClient> newClients = new ConcurrentBag<ConnectedClient>(ConnectedClients);
-                if (newClients.TryTake(out client))
-                {
-                    Groups.Remove(client.ConnectionId, ReceiverGroup);
-                    ConnectedClients = newClients;
-                }
+                Groups.Remove(client.ConnectionId, ReceiverGroup);
+                _clients.Remove(client.Id);
             }
 
             OnConnectedClientRemoved(client);
         }
 
-        protected virtual void OnConnectedClientRemoved(ConnectedClient client)
+        protected virtual void OnConnectedClientRemoved(HubConnectedClient client)
         {
         }
 
         public void Send(Guid fromHubId, Message message)
         {
-            ConnectedClient client = ConnectedClients.FirstOrDefault(c => c.ClientId == fromHubId);
+            HubConnectedClient client = _clients.Single(fromHubId);
             string excludedClient = string.Empty;
 
             if (client != null)
@@ -87,13 +78,6 @@
 
         protected virtual void OnSend(Guid senderId, Message message)
         {
-        }
-
-        protected class ConnectedClient
-        {
-            public Guid ClientId { get; set; }
-
-            public string ConnectionId { get; set; }
         }
     }
 }

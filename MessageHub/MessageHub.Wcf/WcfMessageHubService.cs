@@ -10,58 +10,48 @@
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.Single)]
     public sealed class WcfMessageHubService : IMessageHubService
     {
-        private Lazy<ConcurrentBag<ConnectedClient>> _clients = new Lazy<ConcurrentBag<ConnectedClient>>(() => new ConcurrentBag<ConnectedClient>(), true);
+        private IConnectedClientRepository<WcfConnectedClient> _clients;
 
-        private ConcurrentBag<ConnectedClient> ConnectedClients
+        public WcfMessageHubService(IConnectedClientRepository<WcfConnectedClient> clients)
         {
-            get
-            {
-                return _clients.Value;
-            }
-
-            set
-            {
-                _clients = new Lazy<ConcurrentBag<ConnectedClient>>(() => value, true);
-            }
+            _clients = clients;
         }
 
         public void AddReceiver(Guid receiverId)
         {
-            ConnectedClient client = new ConnectedClient();
+            WcfConnectedClient client = new WcfConnectedClient();
             client.ClientCallback = OperationContext.Current.GetCallbackChannel<IMessageHubServiceReceiver>();
-            client.ClientId = client.ClientCallback.Id;
+            client.Id = client.ClientCallback.Id;
 
-            if (ConnectedClients.Any(c => c.ClientId == client.ClientId))
+            WcfConnectedClient existing = _clients.Single(receiverId);
+
+            if (existing != null)
             {
-                RemoveReceiver(client.ClientId);
+                RemoveReceiver(receiverId);
             }
 
-            ConnectedClients.Add(client);
+            _clients.Add(client);
         }
 
         public void RemoveReceiver(Guid receiverId)
         {
-            ConnectedClient client = ConnectedClients.FirstOrDefault(c => c.ClientId == receiverId);
+            WcfConnectedClient client = _clients.Single(receiverId);
 
             if (client != null)
             {
-                ConcurrentBag<ConnectedClient> newClients = new ConcurrentBag<ConnectedClient>(ConnectedClients);
-                if (newClients.TryTake(out client))
-                {
-                    ConnectedClients = newClients;
-                }
+                _clients.Remove(client.Id);
             }
         }
 
         public void Send(Guid fromHubId, Message message)
         {
-            List<ConnectedClient> receivers = ConnectedClients.ToList();
+            IList<WcfConnectedClient> receivers = _clients.All();
 
-            foreach (ConnectedClient client in receivers)
+            foreach (WcfConnectedClient client in receivers)
             {
                 try
                 {
-                    if (client.ClientId == fromHubId)
+                    if (client.Id == fromHubId)
                     {
                         continue;
                     }
@@ -70,16 +60,9 @@
                 }
                 catch
                 {
-                    RemoveReceiver(client.ClientId);
+                    RemoveReceiver(client.Id);
                 }
             }
-        }
-
-        private class ConnectedClient
-        {
-            public Guid ClientId { get; set; }
-
-            public IMessageHubServiceReceiver ClientCallback { get; set; }
         }
     }
 }
