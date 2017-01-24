@@ -119,7 +119,10 @@
         {
             if (Channels.ContainsKey(message.ChannelName))
             {
-                return Channels[message.ChannelName].Receive(message);
+                if (Channels[message.ChannelName].Id != message.ChannelId)
+                {
+                    return Channels[message.ChannelName].Receive(message);
+                }
             }
 
             return Task.CompletedTask;
