@@ -34,6 +34,7 @@
 
             Message msg = new Message();
             msg.Body = env;
+            msg.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
 
             _remoteQueue.Send(msg);
             return Task.CompletedTask;
@@ -93,11 +94,13 @@
             }
 
             _localQueue = new MessageQueue(_localQueuePath);
+            _localQueue.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
 
             _localQueue.ReceiveCompleted += OnReceiveCompleted;
             _localQueue.BeginReceive();
 
             _remoteQueue = new MessageQueue(_remoteQueuePath);
+            _remoteQueue.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
 
             SendConnectMessage();
 
@@ -109,6 +112,7 @@
             SendDisconnectMessage();
 
             _localQueue.ReceiveCompleted -= OnReceiveCompleted;
+            _localQueue.Purge();
             _localQueue.Close();
             _localQueue.Dispose();
 
@@ -145,6 +149,7 @@
             env.Contents = client;
 
             Message msg = new Message(env);
+            msg.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
 
             _remoteQueue.Send(msg);
 
@@ -159,6 +164,7 @@
             env.Contents = Id;
 
             Message msg = new Message(env);
+            msg.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
 
             _remoteQueue.Send(msg);
 

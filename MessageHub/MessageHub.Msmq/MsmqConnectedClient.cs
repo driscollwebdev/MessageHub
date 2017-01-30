@@ -8,7 +8,8 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class MsmqConnectedClient : IConnectedClient, IMessageHubServiceReceiver, IDisposable
+    [Serializable]
+    public sealed class MsmqConnectedClient : IConnectedClient, IMessageHubServiceReceiver, IDisposable
     {
         private MessageQueue _queue;
 
@@ -20,12 +21,8 @@
         {
             if (_queue == null)
             {
-                if (!MessageQueue.Exists(QueuePath))
-                {
-                    MessageQueue.Create(QueuePath);
-                }
-
                 _queue = new MessageQueue(QueuePath);
+                _queue.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
             }
 
             MessageEnvelope env = new MessageEnvelope
@@ -41,7 +38,7 @@
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {

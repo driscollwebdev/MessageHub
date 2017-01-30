@@ -8,7 +8,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class MsmqMessageHubService : IMessageHubService, IDisposable
+    public sealed class MsmqMessageHubService : IMessageHubService, IDisposable
     {
         private IConnectedClientRepository<MsmqConnectedClient> _clients;
         private MessageQueue _queue;
@@ -23,6 +23,7 @@
             }
 
             _queue = new MessageQueue(queuePath);
+            _queue.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
 
             _queue.ReceiveCompleted += OnReceiveCompleted;
 
@@ -34,26 +35,35 @@
             MessageQueue mq = (MessageQueue)sender;
             Message msg = mq.EndReceive(e.AsyncResult);
 
-            MessageEnvelope env = (MessageEnvelope)msg.Body;
-
-            switch(env.ServiceOp)
+            try
             {
-                case HubServiceOperation.Send:
-                    MessageHub.Message hubMsg = (MessageHub.Message)env.Contents;
-                    Send(env.SenderId, hubMsg);
-                    break;
-                case HubServiceOperation.AddReceiver:
-                    MsmqConnectedClient client = (MsmqConnectedClient)env.Contents;
-                    AddReceiver(client);
-                    break;
-                case HubServiceOperation.RemoveReceiver:
-                    Guid clientId = (Guid)env.Contents;
-                    RemoveReceiver(clientId);
-                    break;
-            }
+                MessageEnvelope env = (MessageEnvelope)msg.Body;
 
-            msg.Dispose();
-            mq.BeginReceive();
+                switch (env.ServiceOp)
+                {
+                    case HubServiceOperation.Send:
+                        MessageHub.Message hubMsg = (MessageHub.Message)env.Contents;
+                        Send(env.SenderId, hubMsg);
+                        break;
+                    case HubServiceOperation.AddReceiver:
+                        MsmqConnectedClient client = (MsmqConnectedClient)env.Contents;
+                        AddReceiver(client);
+                        break;
+                    case HubServiceOperation.RemoveReceiver:
+                        Guid clientId = (Guid)env.Contents;
+                        RemoveReceiver(clientId);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                msg.Dispose();
+                mq.BeginReceive();
+            }
         }
 
         void IMessageHubService.AddReceiver(Guid receiverId)
@@ -96,13 +106,14 @@
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
                     _queue.ReceiveCompleted -= OnReceiveCompleted;
+                    _queue.Purge();
                     _queue.Close();
                     _queue.Dispose();
 

@@ -10,7 +10,8 @@
     [XmlInclude(typeof(MsmqConnectedClient))]
     [XmlInclude(typeof(MessageHub.Message))]
     [XmlInclude(typeof(Guid))]
-    public class MessageEnvelope
+    [Serializable]
+    public sealed class MessageEnvelope
     {
         public Guid SenderId { get; set; }
 

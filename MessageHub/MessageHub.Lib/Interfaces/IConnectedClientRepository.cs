@@ -12,5 +12,7 @@
         void Add(TConnectedClient client);
 
         void Remove(Guid clientId);
+
+        long Count { get; }
     }
 }

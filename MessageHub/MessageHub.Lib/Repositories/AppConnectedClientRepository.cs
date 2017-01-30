@@ -20,6 +20,14 @@
             }
         }
 
+        public long Count
+        {
+            get
+            {
+                return Cache.GetCount();
+            }
+        }
+
         public void Add(TConnectedClient client)
         {
             Cache.Add(client.Id.ToString(), client, null);
