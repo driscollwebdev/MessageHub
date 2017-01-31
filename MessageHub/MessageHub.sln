@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Msmq.Client", "D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Msmq.Service", "Demos\MessageHub.Msmq.Service\MessageHub.Msmq.Service.csproj", "{DECD6F9D-6299-48C0-A975-F3E4F4E55194}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageHub.Msmq.Lib", "Demos\MessageHub.Msmq.Lib\MessageHub.Msmq.Lib.csproj", "{0C52B139-53B7-4B37-94E4-C500EDDB2D9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{DECD6F9D-6299-48C0-A975-F3E4F4E55194}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DECD6F9D-6299-48C0-A975-F3E4F4E55194}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DECD6F9D-6299-48C0-A975-F3E4F4E55194}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C52B139-53B7-4B37-94E4-C500EDDB2D9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C52B139-53B7-4B37-94E4-C500EDDB2D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C52B139-53B7-4B37-94E4-C500EDDB2D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C52B139-53B7-4B37-94E4-C500EDDB2D9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,5 +122,6 @@ Global
 		{2C504EF5-6A89-4700-BA55-855B4E6301DB} = {5C826556-3BB1-4A32-9BB2-4DBFBF514E9D}
 		{9380CE80-CD0B-47BD-817E-ECE4198442DA} = {4FE34677-CD89-4BC6-8A35-55668E9DAB4E}
 		{DECD6F9D-6299-48C0-A975-F3E4F4E55194} = {4FE34677-CD89-4BC6-8A35-55668E9DAB4E}
+		{0C52B139-53B7-4B37-94E4-C500EDDB2D9E} = {4FE34677-CD89-4BC6-8A35-55668E9DAB4E}
 	EndGlobalSection
 EndGlobal

@@ -7,6 +7,9 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using StackExchange.Redis;
+using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
 namespace MessageHub.Msmq.Client
 {
@@ -23,6 +26,8 @@ namespace MessageHub.Msmq.Client
         {
             base.OnStartup(e);
 
+            PopulateCurrentSessionData();
+
             AppHub = MsmqMessageHub.Create()
                                    .WithRemoteQueuePath(@"FormatName:DIRECT=OS:BDRISCOLL-PC2\private$\AppHub");
 
@@ -30,7 +35,7 @@ namespace MessageHub.Msmq.Client
 
             AppHub.Channel("Users").AddReceiver("Add", (userData) =>
             {
-                return Task.Factory.StartNew(() =>
+                return Task.Factory.StartNew(async () =>
                 {
                     RemoteUser user = userData as RemoteUser;
                     if (user != null)
@@ -38,17 +43,17 @@ namespace MessageHub.Msmq.Client
                         RemoteUser existing = Session.Current.AllUsers.FirstOrDefault(u => u.Id == user.Id);
                         if (existing != null)
                         {
-                            App.Current.Dispatcher.Invoke(() => Session.Current.AllUsers.Remove(existing));
+                            await App.Current.Dispatcher.InvokeAsync(() => Session.Current.AllUsers.Remove(existing));
                         }
 
-                        App.Current.Dispatcher.Invoke(() => Session.Current.AllUsers.Add(user));
+                        await App.Current.Dispatcher.InvokeAsync(() => Session.Current.AllUsers.Add(user));
                     }
                 });
             }, channelReceiverId);
 
             App.AppHub.Channel("Users").AddReceiver("Remove", (userData) =>
             {
-                return Task.Factory.StartNew(() =>
+                return Task.Factory.StartNew(async () =>
                 {
                     RemoteUser user = userData as RemoteUser;
                     if (user != null)
@@ -56,7 +61,7 @@ namespace MessageHub.Msmq.Client
                         RemoteUser existing = Session.Current.AllUsers.FirstOrDefault(u => u.Id == user.Id);
                         if (existing != null)
                         {
-                            App.Current.Dispatcher.Invoke(() => Session.Current.AllUsers.Remove(existing));
+                            await App.Current.Dispatcher.InvokeAsync(() => Session.Current.AllUsers.Remove(existing));
                         }
                     }
                 });
@@ -67,10 +72,7 @@ namespace MessageHub.Msmq.Client
                 return Task.Factory.StartNew(() =>
                 {
                     string content = contentData as string;
-                    if (content != null)
-                    {
-                        Session.Current.Content = content;
-                    }
+                    Session.Current.Content = content ?? string.Empty;
                 });
             }, channelReceiverId);
 
@@ -108,6 +110,37 @@ namespace MessageHub.Msmq.Client
             AppHub.Channel("Content").RemoveReceiver("Update", channelReceiverId);
 
             ((RemoteMessageHub)AppHub).Disconnect();
+        }
+
+        private void PopulateCurrentSessionData()
+        {
+            using (ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost"))
+            {
+                IDatabase db = redis.GetDatabase();
+
+                ObservableCollection<RemoteUser> remoteUsers = new ObservableCollection<RemoteUser>(Session.Current.AllUsers.AsEnumerable());
+
+                RedisValue[] serializedUserData = db.SetMembers("AllUsers");
+                foreach (string serializedUser in serializedUserData)
+                {
+                    RemoteUser user = JsonConvert.DeserializeObject<RemoteUser>(serializedUser);
+                    RemoteUser existing = remoteUsers.FirstOrDefault(u => u.Id == user.Id);
+
+                    if (existing != null)
+                    {
+                        remoteUsers.Remove(existing);
+                    }
+
+                    remoteUsers.Add(user);
+                }
+
+                App.Current.Dispatcher.Invoke(() => { Session.Current.AllUsers = remoteUsers; });
+
+                string content = db.StringGet("Content");
+
+                Session.Current.Content = content;
+
+            }
         }
     }
 }

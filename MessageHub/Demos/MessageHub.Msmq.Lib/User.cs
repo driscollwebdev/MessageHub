@@ -1,4 +1,4 @@
-﻿namespace MessageHub.Msmq.Client
+﻿namespace MessageHub.Msmq
 {
     using System;
     using System.Collections.Generic;
