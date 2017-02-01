@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="WcfConnectedClient.cs" />
+    <Compile Include="WcfMessageHubConfiguration.cs" />
     <Compile Include="WcfMessageHubService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WcfMessageHub.cs" />

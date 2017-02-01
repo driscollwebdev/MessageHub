@@ -30,26 +30,22 @@
             base.Receive(message);
         }
 
-        public static SignalRMessageHub Create()
+        public static IRemoteMessageHub Create()
         {
             return new SignalRMessageHub();
         }
 
-        public static SignalRMessageHub Create(LocalMessageHub inner)
+        public static IRemoteMessageHub Create(LocalMessageHub inner)
         {
             return new SignalRMessageHub(inner);
         }
 
-        public SignalRMessageHub WithRemoteEndpoint(string uri)
+        public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
-            _remoteUri = uri;
+            SignalRHubConfiguration hubConfig = (SignalRHubConfiguration)config;
 
-            return this;
-        }
-
-        public SignalRMessageHub WithHubName(string hubName)
-        {
-            _remoteHubName = hubName;
+            _remoteUri = hubConfig.RemoteEndpoint;
+            _remoteHubName = hubConfig.HubName;
 
             return this;
         }

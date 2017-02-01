@@ -45,6 +45,7 @@
     <Compile Include="HubServiceOperations.cs" />
     <Compile Include="MessageEnvelope.cs" />
     <Compile Include="MsmqConnectedClient.cs" />
+    <Compile Include="MsmqHubConfiguration.cs" />
     <Compile Include="MsmqMessageHub.cs" />
     <Compile Include="MsmqMessageHubService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

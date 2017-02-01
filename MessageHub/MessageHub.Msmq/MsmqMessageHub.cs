@@ -45,26 +45,22 @@
             base.Receive(message);
         }
 
-        public static MsmqMessageHub Create()
+        public static IRemoteMessageHub Create()
         {
             return new MsmqMessageHub();
         }
 
-        public static MsmqMessageHub Create(LocalMessageHub inner)
+        public static IRemoteMessageHub Create(LocalMessageHub inner)
         {
             return new MsmqMessageHub(inner);
         }
 
-        public MsmqMessageHub WithLocalQueueName(string name)
+        public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
-            _localQueueName = name;
+            MsmqHubConfiguration msmqConfig = (MsmqHubConfiguration)config;
 
-            return this;
-        }
-
-        public MsmqMessageHub WithRemoteQueuePath(string path)
-        {
-            _remoteQueuePath = path;
+            _localQueueName = msmqConfig.LocalQueueName;
+            _remoteQueuePath = msmqConfig.RemoteQueuePath;
 
             return this;
         }

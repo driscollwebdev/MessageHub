@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StackExchange.Redis;
 using Newtonsoft.Json;
+using MessageHub.Interfaces;
 
 namespace MessageHub.Msmq.Service
 {
@@ -17,7 +18,11 @@ namespace MessageHub.Msmq.Service
             using (MsmqMessageHubService service = new MsmqMessageHubService(".\\private$\\AppHub", new AppConnectedClientRepository<MsmqConnectedClient>()))
             using (ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost"))
             {
-                MsmqMessageHub stateHub = MsmqMessageHub.Create().WithRemoteQueuePath(".\\private$\\AppHub");
+                IRemoteMessageHub stateHub = MsmqMessageHub.Create().WithConfiguration(new MsmqHubConfiguration
+                {
+                    RemoteQueuePath = ".\\private$\\AppHub"
+                });
+
                 stateHub.Connect().Wait();
 
                 Guid stateHubChannelId = Guid.NewGuid();

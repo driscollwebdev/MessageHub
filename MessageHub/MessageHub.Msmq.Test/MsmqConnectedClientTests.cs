@@ -27,13 +27,18 @@ namespace MessageHub.Msmq.Test
                 testClient.Id = Guid.NewGuid();
                 testClient.QueuePath = @".\private$\" + testClient.Id.ToString();
 
+                if (!MessageQueue.Exists(testClient.QueuePath))
+                {
+                    MessageQueue.Create(testClient.QueuePath);
+                }
+
                 testClient.Receive(Guid.NewGuid(), Message.Create().WithData("hello"));
 
                 MessageQueue queue = new MessageQueue(@".\private$\" + testClient.Id.ToString());
                 System.Messaging.Message[] messages = queue.GetAllMessages();
                 Assert.IsTrue(messages.Length > 0);
 
-
+                MessageQueue.Delete(testClient.QueuePath);
             }
         }
     }

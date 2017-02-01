@@ -13,9 +13,11 @@ namespace MessageHub.SignalR.Client
 
         static void Main(string[] args)
         {
-            RemoteMessageHub msgHub = SignalRMessageHub.Create()
-                                                  .WithRemoteEndpoint("http://localhost:8088/messagehub/")
-                                                  .WithHubName("DemoHub");
+            IRemoteMessageHub msgHub = SignalRMessageHub.Create()
+                                                    .WithConfiguration(new SignalRHubConfiguration {
+                                                        RemoteEndpoint = "http://localhost:8088/messagehub/",
+                                                        HubName = "DemoHub"
+                                                    });
 
             msgHub.Connect().Wait();
                                                   

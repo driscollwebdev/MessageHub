@@ -51,9 +51,11 @@
     <Compile Include="Hubs\RemoteMessageHub.cs" />
     <Compile Include="Interfaces\IConnectedClient.cs" />
     <Compile Include="Interfaces\IConnectedClientRepository.cs" />
+    <Compile Include="Interfaces\IHubConfiguration.cs" />
     <Compile Include="Interfaces\IMessageHub.cs" />
     <Compile Include="Interfaces\IMessageHubService.cs" />
     <Compile Include="Interfaces\IMessageHubServiceReceiver.cs" />
+    <Compile Include="Interfaces\IRemoteMessageHub.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Hubs\LocalMessageHub.cs" />
     <Compile Include="MessageEventArgs.cs" />

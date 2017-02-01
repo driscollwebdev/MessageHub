@@ -30,7 +30,7 @@ namespace MessageHub.Msmq.Test
         {
             try
             {
-                MsmqMessageHub test = MsmqMessageHub.Create();
+                IRemoteMessageHub test = MsmqMessageHub.Create();
                 test.Connect();
 
                 Assert.Fail();
@@ -44,8 +44,11 @@ namespace MessageHub.Msmq.Test
         [TestMethod]
         public void LocalQueueShouldExistAfterConnect()
         {
-            MsmqMessageHub test = MsmqMessageHub.Create();
-            test = test.WithRemoteQueuePath($".\\private$\\{test.Id}");
+            IRemoteMessageHub test = MsmqMessageHub.Create();
+            test = test.WithConfiguration(new MsmqHubConfiguration
+            {
+                RemoteQueuePath = $".\\private$\\{test.Id}"
+            });
 
             test.Connect();
 
@@ -55,8 +58,11 @@ namespace MessageHub.Msmq.Test
         [TestMethod]
         public void LocalQueueShouldNotExistAfterDisconnect()
         {
-            MsmqMessageHub test = MsmqMessageHub.Create();
-            test = test.WithRemoteQueuePath($".\\private$\\{test.Id}");
+            IRemoteMessageHub test = MsmqMessageHub.Create();
+            test = test.WithConfiguration(new MsmqHubConfiguration
+            {
+                RemoteQueuePath = $".\\private$\\{test.Id}"
+            });
 
             test.Connect();
 

@@ -7,7 +7,7 @@
     /// <summary>
     /// An abstract class representing a message hub that is connected to a remote server
     /// </summary>
-    public abstract class RemoteMessageHub : IMessageHub
+    public abstract class RemoteMessageHub : IRemoteMessageHub
     {
         /// <summary>
         /// A contained local hub used for much of the basic operation of this hub
@@ -63,6 +63,8 @@
         public virtual void Disconnect()
         {
         }
+
+        public abstract IRemoteMessageHub WithConfiguration(IHubConfiguration config);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RemoteMessageHub"/> class.

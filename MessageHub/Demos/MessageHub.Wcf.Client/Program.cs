@@ -17,9 +17,11 @@ namespace MessageHub.Wcf.Client
 
         static void Main(string[] args)
         {
-            RemoteMessageHub msgHub = WcfMessageHub.Create()
-                                                .WithRemoteEndpoint("net.tcp://localhost:9099/DemoHub")
-                                                .WithBinding(new NetTcpBinding());
+            IRemoteMessageHub msgHub = WcfMessageHub.Create()
+                                                .WithConfiguration(new WcfMessageHubConfiguration {
+                                                    RemoteEndpoint = "net.tcp://localhost:9099/DemoHub",
+                                                    Binding = new NetTcpBinding()
+                                                });
 
             msgHub.Connect().Wait();
 

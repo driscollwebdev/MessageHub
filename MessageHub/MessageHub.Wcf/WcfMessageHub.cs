@@ -28,26 +28,22 @@
             base.Receive(message);
         }
 
-        public static WcfMessageHub Create()
+        public static IRemoteMessageHub Create()
         {
             return new WcfMessageHub();
         }
 
-        public static WcfMessageHub Create(LocalMessageHub inner)
+        public static IRemoteMessageHub Create(LocalMessageHub inner)
         {
             return new WcfMessageHub(inner);
         }
 
-        public WcfMessageHub WithRemoteEndpoint(string uri)
+        public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
-            _remoteUri = uri;
+            WcfMessageHubConfiguration wcfConfig = (WcfMessageHubConfiguration)config;
 
-            return this;
-        }
-
-        public WcfMessageHub WithBinding(System.ServiceModel.Channels.Binding binding)
-        {
-            _channelBinding = binding;
+            _remoteUri = wcfConfig.RemoteEndpoint;
+            _channelBinding = wcfConfig.Binding;
 
             return this;
         }

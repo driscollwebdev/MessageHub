@@ -18,7 +18,7 @@ namespace MessageHub.Msmq.Client
     /// </summary>
     public partial class App : Application
     {
-        public static IMessageHub AppHub { get; private set; }
+        public static IRemoteMessageHub AppHub { get; private set; }
 
         private static Guid channelReceiverId = Guid.NewGuid();
 
@@ -29,9 +29,12 @@ namespace MessageHub.Msmq.Client
             PopulateCurrentSessionData();
 
             AppHub = MsmqMessageHub.Create()
-                                   .WithRemoteQueuePath(@"FormatName:DIRECT=OS:BDRISCOLL-PC2\private$\AppHub");
+                                   .WithConfiguration(new MsmqHubConfiguration
+                                   {
+                                       RemoteQueuePath = @"FormatName:DIRECT=OS:BDRISCOLL-PC2\private$\AppHub"
+                                   });
 
-            ((RemoteMessageHub)AppHub).Connect().Wait();
+            AppHub.Connect().Wait();
 
             AppHub.Channel("Users").AddReceiver("Add", (userData) =>
             {
@@ -109,7 +112,7 @@ namespace MessageHub.Msmq.Client
             AppHub.Channel("Users").RemoveReceiver("Remove", channelReceiverId);
             AppHub.Channel("Content").RemoveReceiver("Update", channelReceiverId);
 
-            ((RemoteMessageHub)AppHub).Disconnect();
+            AppHub.Disconnect();
         }
 
         private void PopulateCurrentSessionData()
