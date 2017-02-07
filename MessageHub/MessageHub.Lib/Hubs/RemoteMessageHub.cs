@@ -155,16 +155,6 @@
             }
         }
 
-        private string GenerateKey()
-        {
-            CspParameters csParams = new CspParameters();
-            csParams.KeyContainerName = Id.ToString();
-
-            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(csParams);
-
-            return rsaProvider.ToXmlString(false);
-        }
-
         protected SecureMessageContainer Encrypt(Message msg)
         {
             SecureMessageContainer container = new SecureMessageContainer();
