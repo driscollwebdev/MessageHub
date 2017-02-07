@@ -7,6 +7,8 @@
     {
         public Guid Id { get; set; }
 
+        public string PublicKey { get; set; }
+
         public string ConnectionId { get; set; }
     }
 }

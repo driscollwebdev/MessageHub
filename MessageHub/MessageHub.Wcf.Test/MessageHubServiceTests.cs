@@ -54,7 +54,7 @@ namespace MessageHub.Lib.Test
         [TestMethod]
         public void ShouldHaveReceiverAfterAddReceiver()
         {
-            client.AddReceiver(Guid.NewGuid());
+            client.AddReceiver(new ConnectedClientData(Guid.NewGuid(), null));
             Assert.IsTrue(true);
         }
 
@@ -71,7 +71,22 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver(test.Id);
+            client.AddReceiver(new ConnectedClientData(test.Id, null));
+            // simulate sending from a different client.
+            client.Send(Guid.NewGuid(), Message.Create().WithType(messageType).WithData(messageData));
+
+            Assert.IsTrue(test.ReceiveCalled);
+            Assert.AreEqual(messageType, test.RemoteMessage.Type);
+            Assert.AreEqual(messageData, (string)test.RemoteMessage.GetDataObject());
+        }
+
+        [TestMethod]
+        public void ShouldTriggerReceiveCallbackAfterSecureSend()
+        {
+            string messageType = "test";
+            string messageData = "Hello, world!";
+
+            client.AddReceiver(new ConnectedClientData(test.Id, null));
             // simulate sending from a different client.
             client.Send(Guid.NewGuid(), Message.Create().WithType(messageType).WithData(messageData));
 
@@ -86,7 +101,7 @@ namespace MessageHub.Lib.Test
             string messageType = "test";
             string messageData = "Hello, world!";
 
-            client.AddReceiver(test.Id);
+            client.AddReceiver(new ConnectedClientData(test.Id, null));
             client.Send(test.Id, Message.Create().WithType(messageType).WithData(messageData));
 
             Assert.IsFalse(test.ReceiveCalled);
@@ -111,6 +126,12 @@ namespace MessageHub.Lib.Test
             public bool ReceiveCalled { get; private set; }
 
             public Message RemoteMessage { get; private set; }
+
+            [OperationContract]
+            public override void Receive(Guid senderId, SecureMessageContainer secureMessage)
+            {
+                throw new NotImplementedException();
+            }
 
             [OperationContract]
             public override void Receive(Guid hubId, Message message)

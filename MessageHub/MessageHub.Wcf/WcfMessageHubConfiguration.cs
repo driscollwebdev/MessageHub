@@ -1,16 +1,12 @@
 ﻿namespace MessageHub.Wcf
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.ServiceModel;
     using System.ServiceModel.Channels;
-    using System.Text;
-    using System.Threading.Tasks;
-    using MessageHub.Interfaces;
+    using Interfaces;
 
     public class WcfMessageHubConfiguration : IHubConfiguration
     {
+        public bool UseEncryption { get; set; }
+
         public string RemoteEndpoint { get; set; }
 
         public Binding Binding { get; set; }

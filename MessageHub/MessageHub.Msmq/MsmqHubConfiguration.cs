@@ -1,14 +1,11 @@
 ﻿namespace MessageHub.Msmq
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using MessageHub.Interfaces;
+    using Interfaces;
 
     public class MsmqHubConfiguration : IHubConfiguration
     {
+        public bool UseEncryption { get; set; }
+
         public string LocalQueueName { get; set; }
 
         public string RemoteQueuePath { get; set; }

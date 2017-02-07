@@ -40,9 +40,30 @@
             return Task.CompletedTask;
         }
 
+        public override Task Broadcast(SecureMessageContainer secureMessage)
+        {
+            MessageEnvelope env = new MessageEnvelope();
+            env.SenderId = Id;
+            env.ServiceOp = HubServiceOperation.Send;
+            env.Contents = secureMessage;
+            env.IsSecure = true;
+
+            Message msg = new Message();
+            msg.Body = env;
+            msg.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
+
+            _remoteQueue.Send(msg);
+            return Task.CompletedTask;
+        }
+
         public void Receive(Guid senderId, MessageHub.Message message)
         {
             base.Receive(message);
+        }
+
+        public void Receive(Guid senderId, SecureMessageContainer secureMessage)
+        {
+            base.Receive(secureMessage);
         }
 
         public static IRemoteMessageHub Create()
@@ -57,6 +78,8 @@
 
         public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
+            UseEncryption = config.UseEncryption;
+
             MsmqHubConfiguration msmqConfig = (MsmqHubConfiguration)config;
 
             _localQueueName = msmqConfig.LocalQueueName;
@@ -125,7 +148,14 @@
 
             MessageEnvelope env = (MessageEnvelope)msg.Body;
 
-            Receive(env.SenderId, (MessageHub.Message)env.Contents);
+            if (env.IsSecure)
+            {
+                Receive(env.SenderId, (MessageHub.SecureMessageContainer)env.Contents);
+            }
+            else
+            {
+                Receive(env.SenderId, (MessageHub.Message)env.Contents);
+            }
 
             msg.Dispose();
             mq.BeginReceive();
@@ -136,7 +166,8 @@
             MsmqConnectedClient client = new MsmqConnectedClient
             {
                 Id = this.Id,
-                QueuePath = $"FormatName:DIRECT=OS:{Environment.MachineName}\\private$\\{_localQueueName}"
+                QueuePath = $"FormatName:DIRECT=OS:{Environment.MachineName}\\private$\\{_localQueueName}",
+                PublicKey = this.PublicKey
             };
 
             MessageEnvelope env = new MessageEnvelope();

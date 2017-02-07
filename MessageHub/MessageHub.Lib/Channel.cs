@@ -11,8 +11,14 @@
     /// </summary>
     public sealed class Channel
     {
+        /// <summary>
+        /// Lazy-initialized field for this channel's receivers
+        /// </summary>
         private Lazy<IDictionary<string, IEnumerable<Receiver>>> _receivers = new Lazy<IDictionary<string, IEnumerable<Receiver>>>(() => new ConcurrentDictionary<string, IEnumerable<Receiver>>(), true);
 
+        /// <summary>
+        /// Gets a value for the channel's receivers
+        /// </summary>
         private IDictionary<string, IEnumerable<Receiver>> Receivers
         {
             get
@@ -21,25 +27,51 @@
             }
         }
 
+        /// <summary>
+        /// An event that is fired when a message is sent from this channel.
+        /// </summary>
         public event EventHandler<MessageEventArgs> MessageSending;
 
+        /// <summary>
+        /// Gets the Id of this channel
+        /// </summary>
         public Guid Id { get; private set; } = Guid.NewGuid();
 
+        /// <summary>
+        /// Gets or sets a value for the name of this channel
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Initializes an instance of the <see cref="Channel"/> class
+        /// </summary>
         private Channel() { }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="Channel"/> class
+        /// </summary>
+        /// <returns>A <see cref="Channel"/> instance</returns>
         public static Channel Create()
         {
             return new Channel();
         }
 
+        /// <summary>
+        /// Sets the name of the current instance and returns the instance
+        /// </summary>
+        /// <param name="name">The name of the current instance</param>
+        /// <returns>The current instance</returns>
         public Channel WithName(string name)
         {
             Name = name;
             return this;
         }
 
+        /// <summary>
+        /// Sets the Id of the current instance and returns the instance
+        /// </summary>
+        /// <param name="id">The Id of the current instance</param>
+        /// <returns>The current instance</returns>
         public Channel WithId(Guid id)
         {
             Id = id;

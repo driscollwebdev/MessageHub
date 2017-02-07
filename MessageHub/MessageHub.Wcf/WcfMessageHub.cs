@@ -23,9 +23,20 @@
             return Task.CompletedTask;
         }
 
-        public void Receive(Guid hubId, Message message)
+        public override Task Broadcast(SecureMessageContainer secureMessage)
+        {
+            _proxy.SendSecure(Id, secureMessage);
+            return Task.CompletedTask;
+        }
+
+        public void Receive(Guid senderId, Message message)
         {
             base.Receive(message);
+        }
+
+        public void Receive(Guid senderId, SecureMessageContainer secureMessage)
+        {
+            base.Receive(secureMessage);
         }
 
         public static IRemoteMessageHub Create()
@@ -40,6 +51,8 @@
 
         public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
+            UseEncryption = config.UseEncryption;
+
             WcfMessageHubConfiguration wcfConfig = (WcfMessageHubConfiguration)config;
 
             _remoteUri = wcfConfig.RemoteEndpoint;
@@ -57,7 +70,13 @@
 
             _channelFactory = new DuplexChannelFactory<IMessageHubService>(this, _channelBinding, new EndpointAddress(_remoteUri));
             _proxy = _channelFactory.CreateChannel();
-            _proxy.AddReceiver(Id);
+
+            if (UseEncryption)
+            {
+                RemotePublicKey = _proxy.GetServiceKey();
+            }
+
+            _proxy.AddReceiver(new ConnectedClientData(Id, PublicKey));
 
             return Task.CompletedTask;
         }

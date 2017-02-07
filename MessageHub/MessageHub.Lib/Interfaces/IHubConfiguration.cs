@@ -1,12 +1,11 @@
 ﻿namespace MessageHub.Interfaces
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
+    /// <summary>
+    /// A marker interface for hub configurations used in ConfigureWith methods.
+    /// </summary>
     public interface IHubConfiguration
     {
+        bool UseEncryption { get; set; }
     }
 }

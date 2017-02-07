@@ -17,6 +17,8 @@
 
         public HubServiceOperation ServiceOp { get; set; }
 
+        public bool IsSecure { get; set; }
+
         public object Contents { get; set; }
     }
 }

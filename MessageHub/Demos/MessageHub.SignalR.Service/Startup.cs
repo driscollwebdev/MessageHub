@@ -9,10 +9,11 @@ namespace MessageHub.SignalR.Service
 {
     public class Startup
     {
+        private static DemoHub _demoHub = new DemoHub(new AppConnectedClientRepository<HubConnectedClient>());
+
         public void Configuration(IAppBuilder app)
         {
-            GlobalHost.DependencyResolver.Register(typeof(DemoHub),
-                () => new DemoHub(new AppConnectedClientRepository<HubConnectedClient>()));
+            GlobalHost.DependencyResolver.Register(typeof(DemoHub), () => _demoHub);
 
             app.Map("/messagehub", map => {
                 map.UseCors(CorsOptions.AllowAll);

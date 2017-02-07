@@ -6,28 +6,41 @@
     using System.Linq;
     using System.ServiceModel;
     using System.Collections.Generic;
+    using System.Security.Cryptography;
+    using Security;
 
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, InstanceContextMode = InstanceContextMode.Single)]
     public sealed class WcfMessageHubService : IMessageHubService
     {
         private IConnectedClientRepository<WcfConnectedClient> _clients;
 
+        private Lazy<SecureKeyProvider> _keyProvider = new Lazy<SecureKeyProvider>(() => new SecureKeyProvider());
+
+        private SecureKeyProvider KeyProvider
+        {
+            get
+            {
+                return _keyProvider.Value;
+            }
+        }
+
         public WcfMessageHubService(IConnectedClientRepository<WcfConnectedClient> clients)
         {
             _clients = clients;
         }
 
-        public void AddReceiver(Guid receiverId)
+        public void AddReceiver(ConnectedClientData clientData)
         {
             WcfConnectedClient client = new WcfConnectedClient();
             client.ClientCallback = OperationContext.Current.GetCallbackChannel<IMessageHubServiceReceiver>();
             client.Id = client.ClientCallback.Id;
+            client.PublicKey = clientData.PublicKey;
 
-            WcfConnectedClient existing = _clients.Single(receiverId);
+            WcfConnectedClient existing = _clients.Single(clientData.Id);
 
             if (existing != null)
             {
-                RemoveReceiver(receiverId);
+                RemoveReceiver(clientData.Id);
             }
 
             _clients.Add(client);
@@ -43,7 +56,12 @@
             }
         }
 
-        public void Send(Guid fromHubId, Message message)
+        public string GetServiceKey()
+        {
+            return KeyProvider.PublicKey;
+        }
+
+        public void Send(Guid senderId, Message message)
         {
             IList<WcfConnectedClient> receivers = _clients.All();
 
@@ -51,12 +69,45 @@
             {
                 try
                 {
-                    if (client.Id == fromHubId)
+                    if (client.Id == senderId)
                     {
                         continue;
                     }
 
-                    client.ClientCallback.Receive(fromHubId, message);
+                    client.ClientCallback.Receive(senderId, message);
+                }
+                catch
+                {
+                    RemoveReceiver(client.Id);
+                }
+            }
+        }
+
+        public void SendSecure(Guid senderId, SecureMessageContainer secureMessage)
+        {
+            byte[] clearKey = KeyProvider.Decrypt(secureMessage.EncryptedKey);
+            byte[] clearIV = KeyProvider.Decrypt(secureMessage.EncryptedIV);
+
+            RSACryptoServiceProvider clientRsaProvider = new RSACryptoServiceProvider();
+
+            IList<WcfConnectedClient> receivers = _clients.All();
+            foreach (WcfConnectedClient client in receivers)
+            {
+                try
+                {
+                    if (client.Id == senderId)
+                    {
+                        continue;
+                    }
+
+                    clientRsaProvider.FromXmlString(client.PublicKey);
+
+                    SecureMessageContainer clientMessage = new SecureMessageContainer();
+                    clientMessage.EncryptedData = secureMessage.EncryptedData;
+                    clientMessage.EncryptedKey = clientRsaProvider.Encrypt(clearKey, false);
+                    clientMessage.EncryptedIV = clientRsaProvider.Encrypt(clearIV, false);
+
+                    client.ClientCallback.Receive(senderId, clientMessage);
                 }
                 catch
                 {

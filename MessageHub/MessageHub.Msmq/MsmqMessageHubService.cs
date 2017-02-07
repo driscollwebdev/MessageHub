@@ -1,10 +1,12 @@
 ﻿namespace MessageHub.Msmq
 {
     using Interfaces;
+    using Security;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Messaging;
+    using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -12,6 +14,15 @@
     {
         private IConnectedClientRepository<MsmqConnectedClient> _clients;
         private MessageQueue _queue;
+        private Lazy<SecureKeyProvider> _keyProvider = new Lazy<SecureKeyProvider>(() => new SecureKeyProvider());
+
+        private SecureKeyProvider KeyProvider
+        {
+            get
+            {
+                return _keyProvider.Value;
+            }
+        }
 
         public MsmqMessageHubService(string queuePath, IConnectedClientRepository<MsmqConnectedClient> clients)
         {
@@ -42,8 +53,16 @@
                 switch (env.ServiceOp)
                 {
                     case HubServiceOperation.Send:
-                        MessageHub.Message hubMsg = (MessageHub.Message)env.Contents;
-                        Send(env.SenderId, hubMsg);
+                        if (env.IsSecure)
+                        {
+                            SecureMessageContainer container = (SecureMessageContainer)env.Contents;
+                            SendSecure(env.SenderId, container);
+                        }
+                        else
+                        {
+                            MessageHub.Message hubMsg = (MessageHub.Message)env.Contents;
+                            Send(env.SenderId, hubMsg);
+                        }
                         break;
                     case HubServiceOperation.AddReceiver:
                         MsmqConnectedClient client = (MsmqConnectedClient)env.Contents;
@@ -55,10 +74,6 @@
                         break;
                 }
             }
-            catch (Exception ex)
-            {
-
-            }
             finally
             {
                 msg.Dispose();
@@ -66,7 +81,7 @@
             }
         }
 
-        void IMessageHubService.AddReceiver(Guid receiverId)
+        void IMessageHubService.AddReceiver(ConnectedClientData clientData)
         {
             throw new NotImplementedException();
         }
@@ -103,6 +118,38 @@
             }
         }
 
+        public void SendSecure(Guid senderId, SecureMessageContainer secureMessage)
+        {
+            var clients = _clients.All();
+
+            byte[] clearKey = KeyProvider.Decrypt(secureMessage.EncryptedKey);
+            byte[] clearIV = KeyProvider.Decrypt(secureMessage.EncryptedIV);
+
+            RSACryptoServiceProvider clientRsaProvider = new RSACryptoServiceProvider();
+
+            foreach(MsmqConnectedClient client in clients)
+            {
+                if (client.Id == senderId)
+                {
+                    continue;
+                }
+
+                clientRsaProvider.FromXmlString(client.PublicKey);
+
+                SecureMessageContainer clientMessage = new SecureMessageContainer();
+                clientMessage.EncryptedData = secureMessage.EncryptedData;
+                clientMessage.EncryptedKey = clientRsaProvider.Encrypt(clearKey, false);
+                clientMessage.EncryptedIV = clientRsaProvider.Encrypt(clearIV, false);
+
+                client.Receive(senderId, clientMessage);
+            }
+        }
+
+        public string GetServiceKey()
+        {
+            return KeyProvider.PublicKey;
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
@@ -112,6 +159,8 @@
             {
                 if (disposing)
                 {
+                    KeyProvider.Dispose();
+
                     _queue.ReceiveCompleted -= OnReceiveCompleted;
                     _queue.Purge();
                     _queue.Close();

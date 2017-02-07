@@ -16,7 +16,8 @@ namespace MessageHub.SignalR.Client
             IRemoteMessageHub msgHub = SignalRMessageHub.Create()
                                                     .WithConfiguration(new SignalRHubConfiguration {
                                                         RemoteEndpoint = "http://localhost:8088/messagehub/",
-                                                        HubName = "DemoHub"
+                                                        HubName = "DemoHub",
+                                                        UseEncryption = true
                                                     });
 
             msgHub.Connect().Wait();

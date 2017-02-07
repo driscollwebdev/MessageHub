@@ -26,6 +26,18 @@ namespace MessageHub.Msmq.Test
         }
 
         [TestMethod]
+        public void ShouldHaveValuesConfiguredAfterWithConfiguration()
+        {
+
+            IRemoteMessageHub test = MsmqMessageHub.Create();
+            
+            test.Configure<MsmqHubConfiguration>(c =>
+            {
+                c.RemoteQueuePath = $".\\private$\\{test.Id}";
+            });
+        }
+
+        [TestMethod]
         public void ShouldThrowExceptionIfRemoteQueueNameIsNotSet()
         {
             try
@@ -45,9 +57,9 @@ namespace MessageHub.Msmq.Test
         public void LocalQueueShouldExistAfterConnect()
         {
             IRemoteMessageHub test = MsmqMessageHub.Create();
-            test = test.WithConfiguration(new MsmqHubConfiguration
+            test.Configure<MsmqHubConfiguration>(c =>
             {
-                RemoteQueuePath = $".\\private$\\{test.Id}"
+                c.RemoteQueuePath = $".\\private$\\{test.Id}";
             });
 
             test.Connect();

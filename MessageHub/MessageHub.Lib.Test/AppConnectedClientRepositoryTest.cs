@@ -85,6 +85,8 @@ namespace MessageHub.Lib.Test
             public Guid Id { get; set; } = Guid.NewGuid();
 
             public string OtherProp { get; set; }
+
+            public string PublicKey { get; set; }
         }
     }
 }

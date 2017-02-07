@@ -15,9 +15,34 @@
 
         public Guid Id { get; set; }
 
+        public string PublicKey { get; set; }
+
         public string QueuePath { get; set; }
 
         public void Receive(Guid hubId, MessageHub.Message message)
+        {
+            MessageEnvelope env = new MessageEnvelope
+            {
+                SenderId = hubId,
+                Contents = message
+            };
+
+            Receive(env);
+        }
+
+        public void Receive(Guid hubId, SecureMessageContainer secureMessage)
+        {
+            MessageEnvelope env = new MessageEnvelope
+            {
+                SenderId = hubId,
+                Contents = secureMessage,
+                IsSecure = true
+            };
+
+            Receive(env);
+        }
+
+        private void Receive(MessageEnvelope envelope)
         {
             if (_queue == null)
             {
@@ -25,13 +50,7 @@
                 _queue.Formatter = new XmlMessageFormatter(new Type[1] { typeof(MessageEnvelope) });
             }
 
-            MessageEnvelope env = new MessageEnvelope
-            {
-                SenderId = hubId,
-                Contents = message
-            };
-
-            Message msg = new Message(env);
+            Message msg = new Message(envelope);
             _queue.Send(msg);
         }
 

@@ -25,9 +25,19 @@
             return _proxy.Invoke("Send", Id, message);
         }
 
+        public override Task Broadcast(SecureMessageContainer secureMessage)
+        {
+            return _proxy.Invoke("SendSecure", Id, secureMessage);
+        }
+
         public void Receive(Guid hubId, Message message)
         {
             base.Receive(message);
+        }
+
+        public void Receive(Guid hubId, SecureMessageContainer secureMessage)
+        {
+            base.Receive(secureMessage);
         }
 
         public static IRemoteMessageHub Create()
@@ -42,6 +52,8 @@
 
         public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
+            UseEncryption = config.UseEncryption;
+
             SignalRHubConfiguration hubConfig = (SignalRHubConfiguration)config;
 
             _remoteUri = hubConfig.RemoteEndpoint;
@@ -72,8 +84,15 @@
 
             await _remoteConnection.Start();
 
+            if (UseEncryption)
+            {
+                RemotePublicKey = await _proxy.Invoke<string>("GetServiceKey");
+            }
+
             _proxy.On<Guid, Message>("Receive", (fromHubId, message) => Receive(fromHubId, message));
-            await _proxy.Invoke("AddReceiver", Id);
+            _proxy.On<Guid, SecureMessageContainer>("ReceiveSecure", (senderId, container) => Receive(senderId, container));
+
+            await _proxy.Invoke("AddReceiver", new ConnectedClientData(Id, PublicKey));
         }
 
         public override void Disconnect()
