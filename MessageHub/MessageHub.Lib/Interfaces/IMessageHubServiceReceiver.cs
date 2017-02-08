@@ -23,6 +23,11 @@
         [OperationContract]
         void Receive(Guid senderId, Message message);
 
+        /// <summary>
+        /// Receives a secure message from the service
+        /// </summary>
+        /// <param name="senderId">The sender Id</param>
+        /// <param name="secureMessage">The secure message container</param>
         [OperationContract(Name = "ReceiveSecure")]
         void Receive(Guid senderId, SecureMessageContainer secureMessage);
     }

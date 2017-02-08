@@ -6,6 +6,9 @@
     /// </summary>
     public interface IHubConfiguration
     {
+        /// <summary>
+        /// Gets or sets a value to determine whether encryption is to be used
+        /// </summary>
         bool UseEncryption { get; set; }
     }
 }

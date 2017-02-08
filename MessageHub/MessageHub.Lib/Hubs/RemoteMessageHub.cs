@@ -163,8 +163,8 @@
             RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
             rsaProvider.FromXmlString(RemotePublicKey);
 
-            container.EncryptedKey = rsaProvider.Encrypt(rmCrypto.Key, false);
-            container.EncryptedIV = rsaProvider.Encrypt(rmCrypto.IV, false);
+            container.EncryptedKey = Convert.ToBase64String(rsaProvider.Encrypt(rmCrypto.Key, false));
+            container.EncryptedIV = Convert.ToBase64String(rsaProvider.Encrypt(rmCrypto.IV, false));
 
             using (MemoryStream enc = new MemoryStream())
             using (CryptoStream cs = new CryptoStream(enc, rmCrypto.CreateEncryptor(), CryptoStreamMode.Write))
@@ -178,7 +178,7 @@
 
                 cs.FlushFinalBlock();
 
-                container.EncryptedData = enc.ToArray();
+                container.EncryptedData = Convert.ToBase64String(enc.ToArray());
             }
 
             return container;
@@ -190,10 +190,10 @@
 
             RijndaelManaged rmCrypto = new RijndaelManaged();
 
-            byte[] key = KeyProvider.Decrypt(container.EncryptedKey);
-            byte[] iv = KeyProvider.Decrypt(container.EncryptedIV);
+            byte[] key = KeyProvider.Decrypt(Convert.FromBase64String(container.EncryptedKey));
+            byte[] iv = KeyProvider.Decrypt(Convert.FromBase64String(container.EncryptedIV));
 
-            using (MemoryStream encrypted = new MemoryStream(container.EncryptedData))
+            using (MemoryStream encrypted = new MemoryStream(Convert.FromBase64String(container.EncryptedData)))
             using (CryptoStream cs = new CryptoStream(encrypted, rmCrypto.CreateDecryptor(key, iv), CryptoStreamMode.Read))
             {
                 byte[] buffer = new byte[encrypted.Length];

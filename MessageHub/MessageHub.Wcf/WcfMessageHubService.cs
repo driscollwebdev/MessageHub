@@ -85,8 +85,8 @@
 
         public void SendSecure(Guid senderId, SecureMessageContainer secureMessage)
         {
-            byte[] clearKey = KeyProvider.Decrypt(secureMessage.EncryptedKey);
-            byte[] clearIV = KeyProvider.Decrypt(secureMessage.EncryptedIV);
+            byte[] clearKey = KeyProvider.Decrypt(Convert.FromBase64String(secureMessage.EncryptedKey));
+            byte[] clearIV = KeyProvider.Decrypt(Convert.FromBase64String(secureMessage.EncryptedIV));
 
             RSACryptoServiceProvider clientRsaProvider = new RSACryptoServiceProvider();
 
@@ -104,8 +104,8 @@
 
                     SecureMessageContainer clientMessage = new SecureMessageContainer();
                     clientMessage.EncryptedData = secureMessage.EncryptedData;
-                    clientMessage.EncryptedKey = clientRsaProvider.Encrypt(clearKey, false);
-                    clientMessage.EncryptedIV = clientRsaProvider.Encrypt(clearIV, false);
+                    clientMessage.EncryptedKey = Convert.ToBase64String(clientRsaProvider.Encrypt(clearKey, false));
+                    clientMessage.EncryptedIV = Convert.ToBase64String(clientRsaProvider.Encrypt(clearIV, false));
 
                     client.ClientCallback.Receive(senderId, clientMessage);
                 }

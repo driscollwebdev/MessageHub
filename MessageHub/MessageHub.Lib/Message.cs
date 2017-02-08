@@ -29,7 +29,7 @@
         public string DataType { get; set; }
 
         [DataMember]
-        public SerializationType SerializationType { get; set; } = SerializationType.Default;
+        public SerializationType SerializationType { get; set; } = SerializationType.Binary;
 
         public Message() { }
 
@@ -137,7 +137,7 @@
                         }
                     }
                     break;
-                case SerializationType.Default:
+                case SerializationType.Binary:
                 default:
                     serializedData = data;
                     break;
@@ -162,7 +162,7 @@
                     break;
                 case SerializationType.Xml:
                     throw new NotSupportedException("Cannot deserialize XML data without type information.");
-                case SerializationType.Default:
+                case SerializationType.Binary:
                 default:
                     deserializedData = data;
                     break;
@@ -197,7 +197,7 @@
                         deserializedData = serializer.Deserialize(reader);
                     }
                     break;
-                case SerializationType.Default:
+                case SerializationType.Binary:
                 default:
                     deserializedData = data;
                     break;
@@ -227,7 +227,7 @@
                         deserializedData = (TData)serializer.Deserialize(reader);
                     }
                     break;
-                case SerializationType.Default:
+                case SerializationType.Binary:
                 default:
                     deserializedData = (TData)data;
                     break;

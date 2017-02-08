@@ -6,9 +6,9 @@
     public enum SerializationType
     {
         /// <summary>
-        /// Default serialization method, typically binary
+        /// Binary serialization
         /// </summary>
-        Default,
+        Binary,
         /// <summary>
         /// JSON serialization
         /// </summary>

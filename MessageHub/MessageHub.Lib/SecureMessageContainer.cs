@@ -1,22 +1,29 @@
 ﻿namespace MessageHub
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.Serialization;
-    using System.Text;
-    using System.Threading.Tasks;
 
+    /// <summary>
+    /// A class that represents an encrypted message
+    /// </summary>
     [DataContract(Namespace = "")]
     public class SecureMessageContainer
     {
+        /// <summary>
+        /// Gets or sets a base64-encoded value for the asymmetrically-encrypted symmetric key used to encrypt the data
+        /// </summary>
         [DataMember]
-        public byte[] EncryptedKey { get; set; }
+        public string EncryptedKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets a base64-encoded value for the asymmetrically-encrypted init vector used to encrypt the data
+        /// </summary>
         [DataMember]
-        public byte[] EncryptedIV { get; set; }
+        public string EncryptedIV { get; set; }
 
+        /// <summary>
+        /// Gets or sets a base64-encoded value for the symetrically encrypted message data
+        /// </summary>
         [DataMember]
-        public byte[] EncryptedData { get; set; }
+        public string EncryptedData { get; set; }
     }
 }

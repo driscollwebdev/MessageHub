@@ -78,6 +78,13 @@
             return this;
         }
 
+        /// <summary>
+        /// Send a message of the specified type with the specified data
+        /// </summary>
+        /// <typeparam name="TData">The type of data for the message payload</typeparam>
+        /// <param name="messageType">The message type</param>
+        /// <param name="data">The message payload</param>
+        /// <returns>A task for continuation purposes</returns>
         public Task Send<TData>(string messageType, TData data)
         {
             Message message = CreateMessage(messageType).WithData(data);
@@ -85,6 +92,14 @@
             return OnMessageSending(message);
         }
 
+        /// <summary>
+        /// Sends a message of the specified type with the specified data serialized with the specified serializer type
+        /// </summary>
+        /// <typeparam name="TData">The type of data for the message payload</typeparam>
+        /// <param name="messageType">The message type</param>
+        /// <param name="data">The message payload</param>
+        /// <param name="serializationType">The serialization type to use for serializing the payload</param>
+        /// <returns>A task for continuation purposes</returns>
         public Task Send<TData>(string messageType, TData data, SerializationType serializationType)
         {
             Message message = CreateMessage(messageType).WithData(data, serializationType);
@@ -92,6 +107,12 @@
             return OnMessageSending(message);
         }
 
+        /// <summary>
+        /// Gets a value indicating whether there exists a receiver identified by the receiverGuid for the specified message type 
+        /// </summary>
+        /// <param name="messageType">The message type</param>
+        /// <param name="receiverGuid">The receiver Guid</param>
+        /// <returns>[True] if the receiver exists for the message type, [False] otherwise</returns>
         public bool HasReceiver(string messageType, Guid receiverGuid)
         {
             if (Receivers.ContainsKey(messageType))
@@ -102,6 +123,12 @@
             return false;
         }
 
+        /// <summary>
+        /// Adds a receiver to the channel for the specified message type and returns a unique ID for the receiver
+        /// </summary>
+        /// <param name="messageType">The message type that the receiver will listen for</param>
+        /// <param name="action">The action to execute when a message of the specified type is received</param>
+        /// <returns>The receiver's unique identifier</returns>
         public Guid AddReceiver(string messageType, Func<object, Task> action)
         {
             Guid receiverGuid = Guid.NewGuid();
@@ -110,6 +137,12 @@
             return receiverGuid;
         }
 
+        /// <summary>
+        /// Adds a receiver with the specified unique identifier to the channel for the specified message type
+        /// </summary>
+        /// <param name="messageType">The message type that the receiver will listen for</param>
+        /// <param name="action">The action to execute when a message of the specified type is received</param>
+        /// <param name="receiverGuid">The receiver's unique identifier</param>
         public void AddReceiver(string messageType, Func<object, Task> action, Guid receiverGuid)
         {
             ConcurrentBag<Receiver> recList = new ConcurrentBag<Receiver>();
@@ -123,6 +156,12 @@
             Receivers[messageType] = recList;
         }
 
+        /// <summary>
+        /// Removes the receiver identified by Id from notifications for the specified message type
+        /// </summary>
+        /// <param name="messageType">The message type</param>
+        /// <param name="receiverGuid">The receiver Id</param>
+        /// <returns>[True] if the receiver was found and removed, [False] otherwise</returns>
         public bool RemoveReceiver(string messageType, Guid receiverGuid)
         {
             if (Receivers.ContainsKey(messageType))
@@ -142,6 +181,11 @@
             return false;
         }
 
+        /// <summary>
+        /// Triggers the channel to receive and propagate the message
+        /// </summary>
+        /// <param name="message">The received message</param>
+        /// <returns>A task for continuation purposes</returns>
         internal Task Receive(Message message)
         {
             if (message.ChannelName != Name)
@@ -166,6 +210,11 @@
             return Task.WhenAll(tasks); 
         }
 
+        /// <summary>
+        /// Creates a message of the specified type
+        /// </summary>
+        /// <param name="messageType">The message type</param>
+        /// <returns>The message</returns>
         private Message CreateMessage(string messageType)
         {
             return Message.Create()
@@ -174,12 +223,22 @@
                           .WithType(messageType);
         }
 
+        /// <summary>
+        /// Triggers the MessageSending event when a message is sent to this channel
+        /// </summary>
+        /// <param name="message">The message sent to the channel</param>
+        /// <returns>A task for continuation purposes</returns>
         private Task OnMessageSending(Message message)
         {
             MessageSending(this, new MessageEventArgs(message));
             return Receive(message);
         }
 
+        /// <summary>
+        /// Gets the actions to execute for the specified message type
+        /// </summary>
+        /// <param name="messageType"></param>
+        /// <returns></returns>
         private IList<Func<object, Task>> GetReceiverActions(string messageType)
         {
             IList<Func<object, Task>> actions = new List<Func<object, Task>>();
@@ -192,12 +251,24 @@
             return actions;
         }
 
+        /// <summary>
+        /// A private class used by Channel to represent a message receiver
+        /// </summary>
         private class Receiver
         {
+            /// <summary>
+            /// Gets or sets a value for the Id of this receiver
+            /// </summary>
             public Guid Id { get; set; } = Guid.NewGuid();
 
+            /// <summary>
+            /// Gets or sets a value for the message type to receive
+            /// </summary>
             public string MessageType { get; set; }
 
+            /// <summary>
+            /// Gets or sets a value for the delegate to execute when a message is received
+            /// </summary>
             public Func<object, Task> OnMessageReceived { get; set; }
         }
     }

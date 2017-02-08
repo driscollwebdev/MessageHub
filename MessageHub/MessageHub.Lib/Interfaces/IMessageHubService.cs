@@ -34,6 +34,10 @@
         [OperationContract]
         void RemoveReceiver(Guid receiverId);
 
+        /// <summary>
+        /// Gets a value for the service's public key
+        /// </summary>
+        /// <returns>A string containing the public key of the service</returns>
         [OperationContract]
         string GetServiceKey();
 
