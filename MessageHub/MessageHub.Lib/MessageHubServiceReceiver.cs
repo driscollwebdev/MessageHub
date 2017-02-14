@@ -37,6 +37,11 @@
         [OperationContract]
         public abstract void Receive(Guid senderId, Message message);
 
+        /// <summary>
+        /// Handles receiving an encrypted message
+        /// </summary>
+        /// <param name="senderId">The Id of the sender</param>
+        /// <param name="secureMessage">The encrypted message to be sent</param>
         [OperationContract]
         public abstract void Receive(Guid senderId, SecureMessageContainer secureMessage);
     }

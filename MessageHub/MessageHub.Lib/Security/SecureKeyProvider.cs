@@ -1,20 +1,31 @@
 ﻿namespace MessageHub.Security
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Security.Cryptography;
-    using System.Text;
-    using System.Threading.Tasks;
 
+    /// <summary>
+    /// A class that provides a public key, key management, and decryption services.
+    /// </summary>
     public sealed class SecureKeyProvider : IDisposable
     {
+        /// <summary>
+        /// The container name to use for this object's lifetime
+        /// </summary>
         private string _secureKeyContainerName = Guid.NewGuid().ToString();
 
+        /// <summary>
+        /// The asymmetric key pair
+        /// </summary>
         private string _secureKey;
 
-        private object _keyGenLock = new object();
+        /// <summary>
+        /// An object used to control access to the key
+        /// </summary>
+        private readonly object _keyGenLock = new object();
 
+        /// <summary>
+        /// Gets a value (as an XML string) for the public key in use by this instance
+        /// </summary>
         public string PublicKey
         {
             get
@@ -34,6 +45,11 @@
             }
         }
 
+        /// <summary>
+        /// Decrypts the encrypted data using the instance's private key
+        /// </summary>
+        /// <param name="data">The data to encrypt</param>
+        /// <returns>A buffer containing decrypted data</returns>
         public byte[] Decrypt(byte[] data)
         {
             CspParameters csParams = new CspParameters();
@@ -44,6 +60,10 @@
             return rsaProvider.Decrypt(data, false);
         }
 
+        /// <summary>
+        /// Generates a full asymmetic key and stores it in a key container.
+        /// </summary>
+        /// <returns>An XML string containing the public key</returns>
         private string GenerateKey()
         {
             CspParameters csParams = new CspParameters();
@@ -57,6 +77,10 @@
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
+        /// <summary>
+        /// Disposes resources associated with the current instance
+        /// </summary>
+        /// <param name="disposing">A boolean that indicates whether the current instance is being disposed</param>
         void Dispose(bool disposing)
         {
             if (!disposedValue)
