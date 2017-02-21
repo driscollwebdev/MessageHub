@@ -43,6 +43,11 @@
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets a value for the default serialization type used for messages in this channel
+        /// </summary>
+        public SerializationType DefaultSerializationType { get; private set; } = SerializationType.None;
+
+        /// <summary>
         /// Initializes an instance of the <see cref="Channel"/> class
         /// </summary>
         private Channel() { }
@@ -79,6 +84,17 @@
         }
 
         /// <summary>
+        /// Sets the default serialization type of the current instance
+        /// </summary>
+        /// <param name="serializationType">The serialization type</param>
+        /// <returns>The current instance</returns>
+        public Channel WithSerializationType(SerializationType serializationType)
+        {
+            DefaultSerializationType = serializationType;
+            return this;
+        }
+
+        /// <summary>
         /// Send a message of the specified type with the specified data
         /// </summary>
         /// <typeparam name="TData">The type of data for the message payload</typeparam>
@@ -87,9 +103,7 @@
         /// <returns>A task for continuation purposes</returns>
         public Task Send<TData>(string messageType, TData data)
         {
-            Message message = CreateMessage(messageType).WithData(data);
-
-            return OnMessageSending(message);
+            return Send(messageType, data, DefaultSerializationType);
         }
 
         /// <summary>

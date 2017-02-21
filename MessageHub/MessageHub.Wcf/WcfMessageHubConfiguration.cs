@@ -7,6 +7,8 @@
     {
         public bool UseEncryption { get; set; }
 
+        public SerializationType DefaultSerializationType { get; set; } = SerializationType.None;
+
         public string RemoteEndpoint { get; set; }
 
         public Binding Binding { get; set; }

@@ -38,6 +38,15 @@ namespace MessageHub.Lib.Test
         }
 
         [TestMethod]
+        public void ShouldHaveSerializationTypeAfterWithSerializationType()
+        {
+            var test = Channel.Create().WithSerializationType(SerializationType.Json);
+
+            Assert.IsNotNull(test);
+            Assert.AreEqual(SerializationType.Json, test.DefaultSerializationType);
+        }
+
+        [TestMethod]
         public void ShouldHaveReceiverAfterAddReceiver()
         {
             var testChannel = Channel.Create();

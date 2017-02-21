@@ -51,7 +51,7 @@
 
         public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
-            UseEncryption = config.UseEncryption;
+            base.WithConfiguration(config);
 
             WcfMessageHubConfiguration wcfConfig = (WcfMessageHubConfiguration)config;
 

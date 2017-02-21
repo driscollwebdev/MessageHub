@@ -78,7 +78,7 @@
 
         public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
-            UseEncryption = config.UseEncryption;
+            base.WithConfiguration(config);
 
             MsmqHubConfiguration msmqConfig = (MsmqHubConfiguration)config;
 

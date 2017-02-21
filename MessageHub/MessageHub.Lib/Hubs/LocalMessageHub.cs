@@ -29,9 +29,14 @@
         }
 
         /// <summary>
+        /// The serialization type that can be set and used for channels created from this hub.
+        /// </summary>
+        private SerializationType _serializationType = SerializationType.None;
+
+        /// <summary>
         /// A lock for the broadcasting event.
         /// </summary>
-        private object locker = new object();
+        private readonly object locker = new object();
 
         /// <summary>
         /// An event that is fired when a message is broadcast
@@ -57,6 +62,12 @@
             return new LocalMessageHub();
         }
 
+        public IMessageHub WithSerializationType(SerializationType serializationType)
+        {
+            _serializationType = serializationType;
+            return this;
+        }
+
         /// <summary>
         /// Gets or creates the channel indicated by name
         /// </summary>
@@ -66,7 +77,7 @@
         {
             if (!Channels.ContainsKey(name))
             {
-                var channel = MessageHub.Channel.Create().WithName(name);
+                var channel = MessageHub.Channel.Create().WithName(name).WithSerializationType(_serializationType);
                 channel.MessageSending += Channel_MessageSending;
 
                 Channels[name] = channel;

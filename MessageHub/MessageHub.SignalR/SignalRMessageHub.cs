@@ -52,14 +52,12 @@
 
         public override IRemoteMessageHub WithConfiguration(IHubConfiguration config)
         {
-            UseEncryption = config.UseEncryption;
-
             SignalRHubConfiguration hubConfig = (SignalRHubConfiguration)config;
 
             _remoteUri = hubConfig.RemoteEndpoint;
             _remoteHubName = hubConfig.HubName;
 
-            return this;
+            return base.WithConfiguration(config);
         }
 
         public override async Task Connect()

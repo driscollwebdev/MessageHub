@@ -108,7 +108,12 @@
         /// </summary>
         /// <param name="config">The configuration object</param>
         /// <returns>The current instance</returns>
-        public abstract IRemoteMessageHub WithConfiguration(IHubConfiguration config);
+        public virtual IRemoteMessageHub WithConfiguration(IHubConfiguration config)
+        {
+            UseEncryption = config.UseEncryption;
+            _innerHub = (LocalMessageHub)_innerHub.WithSerializationType(config.DefaultSerializationType);
+            return this;
+        }
 
         /// <summary>
         /// Configures this hub instance with the configuration function (lambda) provided
